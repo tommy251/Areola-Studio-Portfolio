@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
+// Updated gallery modal - March 2026
 
 interface ProjectDetailProps {
   project: {
