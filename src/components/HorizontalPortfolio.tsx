@@ -109,7 +109,7 @@ const projects: PortfolioProject[] = [
     title: "LATROPIK",
     code: "N0.0003-25",
     category: "Branding",
-    image: "/images/Latropik/la tropik-02.jpg",
+    image: "public/images/Latropik/la tropik-02.jpg",
     images: [
       "/images/latropik/la tropik-02.jpg",
       "/images/latropik/la tropik-03.jpg",
