@@ -63,7 +63,7 @@ const projects: PortfolioProject[] = [
     code: "N0.0002-25",
     category: "Branding",
     // ✅ lowercase "habitat" — matches git
-    image: "/images/habitat/Habitat%20Prj-20.jpg",
+    image: "/images/habitat/Habitat%20Prj-24.jpg",
     images: [
       "/images/habitat/Habitat%20Prj-21.jpg",
       "/images/habitat/Habitat%20Prj-22.jpg",
@@ -109,7 +109,7 @@ const projects: PortfolioProject[] = [
     code: "N0.0003-25",
     category: "Branding",
     // ✅ lowercase "latropik" — matches git
-    image: "/images/latropik/la%20tropik-01.jpg",
+    image: "/images/latropik/la%20tropik-03.jpg",
     images: [
       "/images/latropik/la%20tropik-02.jpg",
       "/images/latropik/la%20tropik-03.jpg",
@@ -172,7 +172,7 @@ const projects: PortfolioProject[] = [
     code: "N0.0005-25",
     category: "Social Media",
     // ✅ lowercase "melstar" — matches git
-    image: "/images/melstar/Artboard%201.jpg",
+    image: "/images/melstar/Artboard%204.jpg",
     images: [
       "/images/melstar/Artboard%202.jpg",
       "/images/melstar/Artboard%204.jpg",
