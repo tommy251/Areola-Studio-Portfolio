@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProjectDetail from "./ProjectDetail";
+// Force fresh build - 28 Feb 2026
 
 interface PortfolioProject {
   id: string;
