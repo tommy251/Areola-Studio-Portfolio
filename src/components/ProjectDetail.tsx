@@ -11,14 +11,19 @@ interface ProjectDetailProps {
     category: string;
     image: string;
     images?: string[];
-    videos?: string[]; // Updated to array for multiple videos
+    videos?: string[];
   };
   onClose: () => void;
 }
 
+// Helper: check if a path is a video file
+const isVideo = (path: string) =>
+  /\.(mp4|webm|ogg|mov)$/i.test(path);
+
 const ProjectDetail = ({ project, onClose }: ProjectDetailProps) => {
   const { t } = useLanguage();
-  const hasGallery = (project.images?.length ?? 0) > 0 || (project.videos?.length ?? 0) > 0;
+  const hasGallery =
+    (project.images?.length ?? 0) > 0 || (project.videos?.length ?? 0) > 0;
 
   return (
     <motion.div
@@ -35,33 +40,76 @@ const ProjectDetail = ({ project, onClose }: ProjectDetailProps) => {
             {project.category} — {project.code}
           </p>
         </div>
-        <button onClick={onClose} className="p-2">
+        <button
+          onClick={onClose}
+          className="p-2 rounded-full hover:bg-muted transition-colors"
+          aria-label="Close"
+        >
           <X size={24} />
         </button>
       </div>
+
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 md:p-8">
         {hasGallery ? (
-          // Scrollable gallery: all images + videos stacked
+          // Scrollable gallery: thumbnail first, then videos, then images
           <div className="space-y-4 md:space-y-8">
-            {/* Main thumbnail as first item */}
-            <img src={project.image} alt={project.title} className="w-full rounded-xl" />
+
+            {/* Main thumbnail — skip if it's an .mp4 (video project) */}
+            {!isVideo(project.image) && (
+              <img
+                src={encodeURI(project.image)}
+                alt={project.title}
+                className="w-full rounded-xl"
+                loading="lazy"
+              />
+            )}
+
             {/* Videos */}
-            {project.videos?.map((vid, i) => (
-              <video key={i} src={vid} controls className="w-full rounded-xl" />
-            ))}
+            {project.videos
+              ?.filter((vid) => vid.trim() !== "")
+              .map((vid, i) => (
+                <video
+                  key={i}
+                  src={encodeURI(vid)}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="w-full rounded-xl"
+                />
+              ))}
+
             {/* Additional images */}
-            {project.images?.map((img, i) => (
-              <img key={i} src={img} alt={`${project.title} ${i + 1}`} className="w-full rounded-xl" />
-            ))}
+            {project.images
+              ?.filter((img) => img.trim() !== "")
+              .map((img, i) => (
+                <img
+                  key={i}
+                  src={encodeURI(img)}
+                  alt={`${project.title} ${i + 1}`}
+                  className="w-full rounded-xl"
+                  loading="lazy"
+                />
+              ))}
           </div>
         ) : (
-          // Full view for single-asset projects
+          // Single-asset fallback
           <>
             {project.videos?.[0] ? (
-              <video src={project.videos[0]} controls className="w-full h-auto max-h-[80vh]" />
+              <video
+                src={encodeURI(project.videos[0])}
+                controls
+                playsInline
+                preload="metadata"
+                className="w-full h-auto max-h-[80vh] rounded-xl"
+              />
             ) : (
-              <img src={project.image} alt={project.title} className="w-full h-auto max-h-[80vh]" />
+              <img
+                src={encodeURI(project.image)}
+                alt={project.title}
+                className="w-full h-auto max-h-[80vh] rounded-xl"
+                loading="lazy"
+              />
             )}
           </>
         )}
