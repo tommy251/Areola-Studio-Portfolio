@@ -9,7 +9,7 @@ interface PortfolioProject {
   title: string;
   code: string;
   category: string;
-  image: string; // thumbnail (can be image or video)
+  image: string; // thumbnail
   images?: string[]; // gallery images
   videos?: string[]; // gallery videos
 }
@@ -109,7 +109,7 @@ const projects: PortfolioProject[] = [
     title: "LATROPIK",
     code: "N0.0003-25",
     category: "Branding",
-    image: "public/images/Latropik/la tropik-02.jpg",
+    image: "/images/Latropik/la tropik-02.jpg",
     images: [
       "/images/latropik/la tropik-02.jpg",
       "/images/latropik/la tropik-03.jpg",
@@ -206,8 +206,8 @@ const projects: PortfolioProject[] = [
     ],
     videos: [],
   },
-  {
- id: "video-editing",
+ {
+    id: "video-editing",
     title: "VIDEO EDITING",
     code: "N0.0007-25",
     category: "Video Editing",
@@ -280,18 +280,7 @@ const HorizontalPortfolio = () => {
                 onClick={() => setSelectedProject(project)}
               >
                 <div className="aspect-[4/3] mb-4 overflow-hidden rounded-xl">
-                  {project.image.endsWith('.mp4') ? (
-                    <video
-                      src={project.image}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
-                  )}
+                  <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
                 </div>
                 <div className="text-center">
                   <h3 className="text-xl font-semibold">{project.title}</h3>
