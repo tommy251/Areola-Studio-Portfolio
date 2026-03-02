@@ -18,7 +18,6 @@ interface ProjectDetailProps {
 
 const ProjectDetail = ({ project, onClose }: ProjectDetailProps) => {
   const { t } = useLanguage();
-  const isBranding = project.category === "Branding";
   const hasGallery = (project.images?.length ?? 0) > 0 || (project.videos?.length ?? 0) > 0;
 
   return (
@@ -26,86 +25,46 @@ const ProjectDetail = ({ project, onClose }: ProjectDetailProps) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-background overflow-y-auto"
+      className="fixed inset-0 bg-background/90 backdrop-blur-sm z-50 flex flex-col"
     >
       {/* Header */}
-      <div className="sticky top-0 z-10 flex items-center justify-between px-6 md:px-10 py-5 bg-background/80 backdrop-blur-sm">
+      <div className="flex justify-between items-center p-4 md:p-8 border-b">
         <div>
-          <h2 className="text-sm font-medium tracking-wide text-foreground uppercase">
-            {project.title}
-          </h2>
-          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+          <h2 className="text-2xl font-bold">{project.title}</h2>
+          <p className="text-muted-foreground">
             {project.category} — {project.code}
-          </span>
+          </p>
         </div>
-        <button
-          onClick={onClose}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border transition-colors hover:border-primary hover:text-primary"
-          data-cursor-hover
-        >
-          <X size={18} />
+        <button onClick={onClose} className="p-2">
+          <X size={24} />
         </button>
       </div>
-
       {/* Content */}
-      <div className="px-6 md:px-10 pb-20">
-        <div className="w-full max-w-5xl mx-auto">
-          {isBranding && hasGallery ? (
-            // Scrollable gallery for Branding: all images + videos stacked
-            <div className="space-y-6">
-              {/* Main thumbnail as first item */}
-              <img
-                src={project.image}
-                alt={project.title}
-                className="w-full rounded-sm object-contain"
-                style={{ maxHeight: "80vh" }}
-              />
-              {/* Videos */}
-              {project.videos?.map((vid, i) => (
-                <video
-                  key={`vid-${i}`}
-                  src={vid}
-                  controls
-                  autoPlay
-                  loop
-                  muted
-                  className="w-full rounded-sm"
-                  style={{ maxHeight: "80vh" }}
-                />
-              ))}
-              {/* Additional images */}
-              {project.images?.map((img, i) => (
-                <img
-                  key={`img-${i}`}
-                  src={img}
-                  alt={`${project.title} ${i + 1}`}
-                  className="w-full rounded-sm object-contain"
-                  style={{ maxHeight: "80vh" }}
-                />
-              ))}
-            </div>
-          ) : (
-            // Full view for Social Media or single-asset projects
-            <>
-              {project.videos?.[0] ? (
-                <video
-                  src={project.videos[0]}
-                  controls
-                  autoPlay
-                  className="w-full rounded-sm"
-                  style={{ maxHeight: "80vh" }}
-                />
-              ) : (
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full rounded-sm"
-                  style={{ maxHeight: "80vh" }}
-                />
-              )}
-            </>
-          )}
-        </div>
+      <div className="flex-1 overflow-y-auto p-4 md:p-8">
+        {hasGallery ? (
+          // Scrollable gallery: all images + videos stacked
+          <div className="space-y-4 md:space-y-8">
+            {/* Main thumbnail as first item */}
+            <img src={project.image} alt={project.title} className="w-full rounded-xl" />
+            {/* Videos */}
+            {project.videos?.map((vid, i) => (
+              <video key={i} src={vid} controls className="w-full rounded-xl" />
+            ))}
+            {/* Additional images */}
+            {project.images?.map((img, i) => (
+              <img key={i} src={img} alt={`${project.title} ${i + 1}`} className="w-full rounded-xl" />
+            ))}
+          </div>
+        ) : (
+          // Full view for single-asset projects
+          <>
+            {project.videos?.[0] ? (
+              <video src={project.videos[0]} controls className="w-full h-auto max-h-[80vh]" />
+            ) : (
+              <img src={project.image} alt={project.title} className="w-full h-auto max-h-[80vh]" />
+            )}
+          </>
+        )}
       </div>
     </motion.div>
   );

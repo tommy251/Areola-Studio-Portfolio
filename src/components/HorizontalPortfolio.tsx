@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProjectDetail from "./ProjectDetail";
-// Force fresh build - 28 Feb 2026
+// Force fresh build - 02 Mar 2026
 
 interface PortfolioProject {
   id: string;
@@ -20,33 +20,37 @@ const projects: PortfolioProject[] = [
     title: "VITAL HR",
     code: "N0.0001-25",
     category: "Branding",
-    image: "/images/vital-hr/Vital HR Brand strategy and Moodboard-25.jpg",
+    image: "/images/Vital HR/Vital HR Brand strategy and Moodboard-25.jpg",
     images: [
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-23.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-24.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-26.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-27.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-28.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-29.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-30.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-31.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-32.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-33.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-34.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-35.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-36.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-37.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-38.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-42.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-43.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-44.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-45.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-46.jpg",
-      "/images/vital-hr/Vital HR Brand strategy and Moodboard-47.jpg",
-      "/images/vital-hr/vit sm.jpg",
-      "/images/vital-hr/vit sm 6.png",
-      "/images/vital-hr/vit stationary.jpg",
-      "/images/vital-hr/vita val.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-23.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-24.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-26.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-27.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-28.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-29.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-30.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-31.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-32.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-33.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-34.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-35.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-36.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-37.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-38.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-42.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-43.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-44.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-45.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-46.jpg",
+      "/images/Vital HR/Vital HR Brand strategy and Moodboard-47.jpg",
+      "/images/Vital HR SM Banner/vit sm.png",
+      "/images/Vital HR SM Banner/vit sm 6.png",
+      "/images/Vital HR SM Banner/Artboard 1.jpg",
+      "/images/Vital HR SM Banner/vital.jpg",
+      "/images/Vital HR SM Banner/A long time ago.jpg",
+      "/images/Vital HR SM Banner/Artboard 25.jpg",
+      "/images/Vital HR SM Banner/Artboard 7.jpg",
+      "/images/Vital HR SM Banner/vers5.jpg",
     ],
     videos: [],
   },
@@ -55,49 +59,47 @@ const projects: PortfolioProject[] = [
     title: "HABITAT",
     code: "N0.0002-25",
     category: "Branding",
-    image: "/images/habitat/Habitat Prj-20.jpg",
+    image: "/images/Habitat/Habitat Prj-20.jpg",
     images: [
-      "/images/habitat/Habitat Prj-21.jpg",
-      "/images/habitat/Habitat Prj-22.jpg",
-      "/images/habitat/Habitat Prj-23.jpg",
-      "/images/habitat/Habitat Prj-24.jpg",
-      "/images/habitat/Habitat Prj-25.jpg",
-      "/images/habitat/Habitat Prj-26.jpg",
-      "/images/habitat/Habitat Prj-27.jpg",
-      "/images/habitat/Habitat Prj-28.jpg",
-      "/images/habitat/Habitat Prj-29.jpg",
-      "/images/habitat/Habitat Prj-30.jpg",
-      "/images/habitat/Habitat Prj-31.jpg",
-      "/images/habitat/Habitat Prj-32.jpg",
-      "/images/habitat/Habitat Prj-33.jpg",
-      "/images/habitat/Habitat Prj-34.jpg",
-      "/images/habitat/Habitat Prj-35.jpg",
-      "/images/habitat/Habitat Prj-36.jpg",
-      "/images/habitat/Habitat Prj-37.jpg",
-      "/images/habitat/Habitat Prj-38.jpg",
-      "/images/habitat/Habitat Prj-39.jpg",
-      "/images/habitat/Habitat Prj-40.jpg",
-      "/images/habitat/hab letterhead-01.jpg",
-      "/images/habitat/hab pen merch.jpg",
-      "/images/habitat/hab shirt(best be a round neck).jpg",
-      "/images/habitat/pot plant hab.jpg",
-      "/images/habitat/tote bag hab.jpg",
-      "/images/habitat/hab green.png",
-      "/images/habitat/hab grey.png",
-      "/images/habitat/hab icon green.png",
-      "/images/habitat/hab icon grey.png",
-      "/images/habitat/hab icon red.png",
-      "/images/habitat/hab sec logo.png",
-      "/images/habitat/hab prop 1.png",
-      "/images/habitat/hab prop 2.png",
-      "/images/habitat/hab prop 3.png",
-      "/images/habitat/hab prop 4.png",
-      "/images/habitat/hab prop 5.png",
-      "/images/habitat/hab prop 6.png",
+      "/images/Habitat/Habitat Prj-21.jpg",
+      "/images/Habitat/Habitat Prj-22.jpg",
+      "/images/Habitat/Habitat Prj-23.jpg",
+      "/images/Habitat/Habitat Prj-24.jpg",
+      "/images/Habitat/Habitat Prj-25.jpg",
+      "/images/Habitat/Habitat Prj-26.jpg",
+      "/images/Habitat/Habitat Prj-27.jpg",
+      "/images/Habitat/Habitat Prj-28.jpg",
+      "/images/Habitat/Habitat Prj-29.jpg",
+      "/images/Habitat/Habitat Prj-30.jpg",
+      "/images/Habitat/Habitat Prj-31.jpg",
+      "/images/Habitat/Habitat Prj-32.jpg",
+      "/images/Habitat/Habitat Prj-33.jpg",
+      "/images/Habitat/Habitat Prj-34.jpg",
+      "/images/Habitat/Habitat Prj-35.jpg",
+      "/images/Habitat/Habitat Prj-36.jpg",
+      "/images/Habitat/Habitat Prj-37.jpg",
+      "/images/Habitat/Habitat Prj-38.jpg",
+      "/images/Habitat/Habitat Prj-39.jpg",
+      "/images/Habitat/Habitat Prj-40.jpg",
+      "/images/Habitat/hab green.png",
+      "/images/Habitat/hab grey.png",
+      "/images/Habitat/hab icon green.png",
+      "/images/Habitat/hab icon grey.png",
+      "/images/Habitat/hab icon red.png",
+      "/images/Habitat/pot plant hab.jpg",
+      "/images/Habitat/hab sec logo.png",
+      "/images/Habitat/broch mock.jpg",
+      "/images/Habitat/Artboard 1.jpg",
+      "/images/Habitat/Artboard 2.jpg",
+      "/images/Habitat/IG profile pic full name.jpg",
+      "/images/Habitat/IG profile pic 4.jpg",
+      "/images/Habitat/IG profile pic 2.jpg",
+      "/images/Habitat/IG profile pic 3.jpg",
+      "/images/Habitat/IG profile pic.jpg",
     ],
     videos: [
-      "/images/habitat/Hab Intro.mp4",
-      "/images/habitat/Habitat Vid Final.mp4",
+      "/images/Video/Hab Intro.mp4",
+      "/images/Habitat/Habitat Vid Final.mp4",
     ],
   },
   {
@@ -105,36 +107,34 @@ const projects: PortfolioProject[] = [
     title: "LATROPIK",
     code: "N0.0003-25",
     category: "Branding",
-    image: "/images/latropik/la tropik-01.jpg",
+    image: "/images/Latropik/la tropik-01.jpg",
     images: [
-      "/images/latropik/la tropik-02.jpg",
-      "/images/latropik/la tropik-03.jpg",
-      "/images/latropik/la tropik-04.jpg",
-      "/images/latropik/la tropik-05.jpg",
-      "/images/latropik/la tropik-06.jpg",
-      "/images/latropik/la tropik-07.jpg",
-      "/images/latropik/la tropik-08.jpg",
-      "/images/latropik/la tropik-09.jpg",
-      "/images/latropik/la tropik-10.jpg",
-      "/images/latropik/la tropik-11.jpg",
-      "/images/latropik/la tropik-12.jpg",
-      "/images/latropik/la tropik-13.jpg",
-      "/images/latropik/la tropik-14.jpg",
-      "/images/latropik/la tropik-15.jpg",
-      "/images/latropik/la tropik-16.jpg",
-      "/images/latropik/la tropik-17.jpg",
-      "/images/latropik/la tropik-18.jpg",
-      "/images/latropik/la tropik-19.jpg",
-      "/images/latropik/la tropik-20.jpg",
-      "/images/latropik/la tropik-21.jpg",
-      "/images/latropik/la tropik-22.jpg",
-      "/images/latropik/la tropik-23.jpg",
-      "/images/latropik/la tropik-24.jpg",
-      "/images/latropik/biz trop.jpg",
-      "/images/latropik/trop ban.jpg",
-      "/images/latropik/trop lette.jpg",
-      "/images/latropik/tropik.jpg",
-      "/images/latropik/tropik 3.jpg",
+      "/images/Latropik/la tropik-02.jpg",
+      "/images/Latropik/la tropik-03.jpg",
+      "/images/Latropik/la tropik-04.jpg",
+      "/images/Latropik/la tropik-05.jpg",
+      "/images/Latropik/la tropik-06.jpg",
+      "/images/Latropik/la tropik-07.jpg",
+      "/images/Latropik/la tropik-08.jpg",
+      "/images/Latropik/la tropik-09.jpg",
+      "/images/Latropik/la tropik-10.jpg",
+      "/images/Latropik/la tropik-11.jpg",
+      "/images/Latropik/la tropik-12.jpg",
+      "/images/Latropik/la tropik-13.jpg",
+      "/images/Latropik/la tropik-14.jpg",
+      "/images/Latropik/la tropik-15.jpg",
+      "/images/Latropik/la tropik-16.jpg",
+      "/images/Latropik/la tropik-17.jpg",
+      "/images/Latropik/la tropik-18.jpg",
+      "/images/Latropik/la tropik-19.jpg",
+      "/images/Latropik/la tropik-20.jpg",
+      "/images/Latropik/la tropik-21.jpg",
+      "/images/Latropik/la tropik-22.jpg",
+      "/images/Latropik/la tropik-23.jpg",
+      "/images/Latropik/la tropik-24.jpg",
+      "/images/Latropik/biz trop.jpg",
+      "/images/Latropik/trop ban.jpg",
+      "/images/Latropik/trop lette.jpg",
     ],
     videos: [],
   },
@@ -143,44 +143,72 @@ const projects: PortfolioProject[] = [
     title: "ELCHAY",
     code: "N0.0004-25",
     category: "Social Media",
-    image: "/images/elchay/Artboard 1.jpg",
-    images: [],
-    videos: ["/images/elchay/elch vid 2.mp4"],
-  },
-  {
-    id: "oyinbo",
-    title: "OYINBO",
-    code: "N0.0005-25",
-    category: "Social Media",
-    image: "/images/oyinbo/Artboard 2.jpg",
-    images: [],
-    videos: ["/images/oyinbo/oyin M.mp4"],
+    image: "/images/ELCHAY Social Media/Artboard 1.jpg",
+    images: [
+      "/images/ELCHAY Social Media/Artboard 2.jpg",
+      "/images/ELCHAY Social Media/Artboard 3.jpg",
+      "/images/ELCHAY Social Media/Artboard 4.jpg",
+      "/images/ELCHAY Social Media/Artboard 5.jpg",
+      "/images/ELCHAY Social Media/Artboard 6.jpg",
+      "/images/ELCHAY Social Media/Artboard 7.jpg",
+      "/images/ELCHAY Social Media/Artboard 11.jpg",
+      "/images/ELCHAY Social Media/Artboard 12.jpg",
+      "/images/ELCHAY Social Media/Artboard 14.jpg",
+      "/images/ELCHAY Social Media/Artboard 15.jpg",
+      "/images/ELCHAY Social Media/Artboard 16.jpg",
+      "/images/ELCHAY Social Media/Artboard 17.jpg",
+      "/images/ELCHAY Social Media/Artboard 18.jpg",
+      "/images/ELCHAY Social Media/Artboard 19.jpg",
+      "/images/ELCHAY Social Media/Artboard 20.jpg",
+      "/images/ELCHAY Social Media/Artboard 21.jpg",
+      "/images/ELCHAY Social Media/Last month.jpg",
+      "/images/ELCHAY Social Media/Earlier this year.jpg",
+    ],
+    videos: ["/images/Video/elch vid 2.mp4"],
   },
   {
     id: "melstar",
     title: "MELSTAR",
-    code: "N0.0006-25",
+    code: "N0.0005-25",
     category: "Social Media",
-    image: "/images/melstar/Artboard 3.jpg",
-    images: [],
+    image: "/images/Melstar/Artboard 3.jpg",
+    images: [
+      "/images/Melstar/Artboard 1.jpg",
+      "/images/Melstar/Artboard 2.jpg",
+      "/images/Melstar/Artboard 4.jpg",
+      "/images/Melstar/Artboard 5.jpg",
+      "/images/Melstar/Artboard 6.jpg",
+      "/images/Melstar/Artboard 7.jpg",
+      "/images/Melstar/Artboard 8.jpg",
+      "/images/Melstar/Artboard 9.jpg",
+      "/images/Melstar/Artboard 10.jpg",
+      "/images/Melstar/A long time ago.jpg",
+    ],
     videos: [],
   },
   {
     id: "riahrare",
     title: "RIAHRARE",
-    code: "N0.0007-25",
+    code: "N0.0006-25",
     category: "Social Media",
-    image: "/images/riahrare/Artboard 4.jpg",
-    images: [],
+    image: "/images/Riah Rare/A long time ago.jpg",
+    images: [
+      "/images/Riah Rare/Artboard 1.jpg",
+      "/images/Riah Rare/Artboard 2.jpg",
+      "/images/Riah Rare/Artboard 3.jpg",
+      "/images/Riah Rare/Artboard 5.jpg",
+      "/images/Riah Rare/Artboard 6.jpg",
+      "/images/Riah Rare/Artboard 7.jpg",
+    ],
     videos: [],
   },
 ];
 
 const HorizontalPortfolio = () => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef(null);
+  const sectionRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -202,7 +230,6 @@ const HorizontalPortfolio = () => {
       const sectionTop = -rect.top;
       const sectionHeight = section.offsetHeight - window.innerHeight;
       const progress = Math.max(0, Math.min(1, sectionTop / sectionHeight));
-
       const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
       scrollContainer.scrollLeft = progress * maxScroll;
 
@@ -217,88 +244,39 @@ const HorizontalPortfolio = () => {
 
   return (
     <>
-      <section
-        ref={sectionRef}
-        className="relative"
-        style={{ height: `${projects.length * 80}vh` }}
-      >
-        <div className="sticky top-0 h-screen overflow-hidden">
-          <div className="flex items-center justify-between px-6 md:px-10 pt-8 pb-4">
-            <div>
-              <h2 className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                {t("selectedWorks")}
-              </h2>
-            </div>
-            <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+      <section ref={sectionRef} className="relative h-[300vh] bg-background">
+        <div className="sticky top-0 h-screen flex flex-col justify-center px-8 md:px-16">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold">{t("selectedWorks")}</h2>
+            <span className="text-xl md:text-2xl">
               ({String(activeIndex + 1).padStart(2, "0")}/{String(projects.length).padStart(2, "0")})
-            </div>
+            </span>
           </div>
-
-          <div
-            ref={scrollRef}
-            className="flex h-[calc(100vh-80px)] items-center gap-6 overflow-x-hidden px-6 md:px-10"
-            style={{ scrollbarWidth: "none" }}
-          >
+          <div ref={scrollRef} className="flex overflow-x-hidden space-x-4 md:space-x-8">
             {projects.map((project, index) => (
               <motion.div
                 key={project.id}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="group relative flex-shrink-0"
-                style={{ width: "clamp(300px, 42vw, 600px)" }}
-                data-cursor-hover
+                className="flex-shrink-0 w-[90vw] md:w-[40vw] cursor-pointer"
                 onClick={() => setSelectedProject(project)}
               >
-                <div className="relative overflow-hidden rounded-sm aspect-[3/4] cursor-pointer">
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                    loading="lazy"
-                  />
-
-                  <div className="absolute inset-0 bg-background/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-border">
-                    <div
-                      className="h-full bg-primary transition-all duration-300"
-                      style={{
-                        width: activeIndex === index ? "100%" : "0%",
-                      }}
-                    />
-                  </div>
+                <div className="aspect-[4/3] mb-4 overflow-hidden rounded-xl">
+                  <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
                 </div>
-
-                <div className="mt-4 flex items-center justify-between">
-                  <div>
-                    <span className="text-sm font-medium tracking-wide text-foreground">
-                      {project.title}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                      {project.category}
-                    </span>
-                    <span className="text-[10px] text-muted-foreground">
-                      ({project.code})
-                    </span>
-                  </div>
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold">{project.title}</h3>
+                  <p className="text-muted-foreground">
+                    {project.category}
+                    <span className="ml-2">({project.code})</span>
+                  </p>
                 </div>
               </motion.div>
             ))}
-
-            <div className="flex-shrink-0 w-[20vw]" />
           </div>
         </div>
       </section>
-
       <AnimatePresence>
         {selectedProject && (
-          <ProjectDetail
-            project={selectedProject}
-            onClose={() => setSelectedProject(null)}
-          />
+          <ProjectDetail project={selectedProject} onClose={() => setSelectedProject(null)} />
         )}
       </AnimatePresence>
     </>
