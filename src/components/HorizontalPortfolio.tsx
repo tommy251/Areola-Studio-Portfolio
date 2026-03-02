@@ -9,7 +9,7 @@ interface PortfolioProject {
   title: string;
   code: string;
   category: string;
-  image: string; // thumbnail
+  image: string; // thumbnail (can be image or video)
   images?: string[]; // gallery images
   videos?: string[]; // gallery videos
 }
@@ -20,7 +20,7 @@ const projects: PortfolioProject[] = [
     title: "VITAL HR",
     code: "N0.0001-25",
     category: "Branding",
-    image: "/images/Vital HR/Vital HR Brand strategy and Moodboard-25.jpg",
+    image: "/images/Vital HR/Vital HR Brand strategy and Moodboard-45.jpg",
     images: [
       "/images/Vital HR/Vital HR Brand strategy and Moodboard-23.jpg",
       "/images/Vital HR/Vital HR Brand strategy and Moodboard-24.jpg",
@@ -60,7 +60,7 @@ const projects: PortfolioProject[] = [
     title: "HABITAT",
     code: "N0.0002-25",
     category: "Branding",
-    image: "/images/habitat/Habitat Prj-20.jpg",
+    image: "/images/Habitat/Habitat Prj-33.jpg",
     images: [
       "/images/habitat/Habitat Prj-21.jpg",
       "/images/habitat/Habitat Prj-22.jpg",
@@ -101,8 +101,7 @@ const projects: PortfolioProject[] = [
       "/images/habitat/hab prop 6.png",
     ],
     videos: [
-      "/images/habitat/Hab Intro.mp4",
-      "/images/habitat/Habitat Vid Final.mp4",
+      "/images/Habitat/Habitat Vid Final.mp4",
     ],
   },
   {
@@ -110,7 +109,7 @@ const projects: PortfolioProject[] = [
     title: "LATROPIK",
     code: "N0.0003-25",
     category: "Branding",
-    image: "/images/latropik/la tropik-01.jpg",
+    image: "/images/Latropik/la tropik-02.jpg",
     images: [
       "/images/latropik/la tropik-02.jpg",
       "/images/latropik/la tropik-03.jpg",
@@ -169,7 +168,7 @@ const projects: PortfolioProject[] = [
       "/images/ELCHAY Social Media/Last month.jpg",
       "/images/ELCHAY Social Media/Earlier this year.jpg",
     ],
-    videos: ["/images/Video/elch vid 2.mp4"],
+    videos: [],
   },
 
   {
@@ -177,7 +176,7 @@ const projects: PortfolioProject[] = [
     title: "MELSTAR",
     code: "N0.0005-25",
     category: "Social Media",
-    image: "/images/melstar/Artboard 3.jpg",
+    image: "/images/Melstar/Artboard 4.jpg",
     images: [
       "/images/melstar/Artboard 1.jpg",
       "/images/melstar/Artboard 2.jpg",
@@ -196,7 +195,7 @@ const projects: PortfolioProject[] = [
     title: "RIAHRARE",
     code: "N0.0006-25",
     category: "Social Media",
-    image: "/images/Riah Rare/A long time ago.jpg",
+    image: "/images/Riah Rare/Artboard 1.jpg",
     images: [
       "/images/Riah Rare/Artboard 1.jpg",
       "/images/Riah Rare/Artboard 2.jpg",
@@ -206,6 +205,22 @@ const projects: PortfolioProject[] = [
       "/images/Riah Rare/Artboard 7.jpg",
     ],
     videos: [],
+  },
+  {
+ id: "video-editing",
+    title: "VIDEO EDITING",
+    code: "N0.0007-25",
+    category: "Video Editing",
+    image: "/images/Video/Hab Intro.mp4",
+    images: [],
+    videos: [
+      "/images/Video/elch vid 2.mp4",
+      "/images/Video/Hab Intro.mp4",
+      "/images/Video/o yin M.mp4",
+      "/images/Video/stack 6.mp4",
+      "/images/Video/zero vid ad.mp4",
+      "/images/Video/A long time ago.mp4",
+    ],
   },
 ];
 
@@ -265,7 +280,18 @@ const HorizontalPortfolio = () => {
                 onClick={() => setSelectedProject(project)}
               >
                 <div className="aspect-[4/3] mb-4 overflow-hidden rounded-xl">
-                  <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+                  {project.image.endsWith('.mp4') ? (
+                    <video
+                      src={project.image}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
+                  )}
                 </div>
                 <div className="text-center">
                   <h3 className="text-xl font-semibold">{project.title}</h3>

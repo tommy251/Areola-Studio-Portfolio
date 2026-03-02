@@ -18,6 +18,7 @@ interface ProjectDetailProps {
 
 const ProjectDetail = ({ project, onClose }: ProjectDetailProps) => {
   const { t } = useLanguage();
+  const isBranding = project.category === "Branding";
   const hasGallery = (project.images?.length ?? 0) > 0 || (project.videos?.length ?? 0) > 0;
 
   return (
@@ -41,11 +42,15 @@ const ProjectDetail = ({ project, onClose }: ProjectDetailProps) => {
       </div>
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-4 md:p-8">
-        {hasGallery ? (
-          // Scrollable gallery: all images + videos stacked
+        {isBranding && hasGallery ? (
+          // Scrollable gallery for Branding: all images + videos stacked
           <div className="space-y-4 md:space-y-8">
             {/* Main thumbnail as first item */}
-            <img src={project.image} alt={project.title} className="w-full rounded-xl" />
+            {project.image.endsWith('.mp4') ? (
+              <video src={project.image} controls className="w-full rounded-xl" />
+            ) : (
+              <img src={project.image} alt={project.title} className="w-full rounded-xl" />
+            )}
             {/* Videos */}
             {project.videos?.map((vid, i) => (
               <video key={i} src={vid} controls className="w-full rounded-xl" />
@@ -56,13 +61,17 @@ const ProjectDetail = ({ project, onClose }: ProjectDetailProps) => {
             ))}
           </div>
         ) : (
-          // Full view for single-asset projects
+          // Full view for Social Media or single-asset projects
           <>
-            {project.videos?.[0] ? (
-              <video src={project.videos[0]} controls className="w-full h-auto max-h-[80vh]" />
-            ) : (
-              <img src={project.image} alt={project.title} className="w-full h-auto max-h-[80vh]" />
-            )}
+            {(() => {
+              const mainAsset = project.videos?.[0] || project.image;
+              const isMainVideo = mainAsset.endsWith('.mp4');
+              return isMainVideo ? (
+                <video src={mainAsset} controls className="w-full h-auto max-h-[80vh]" />
+              ) : (
+                <img src={mainAsset} alt={project.title} className="w-full h-auto max-h-[80vh]" />
+              );
+            })()}
           </>
         )}
       </div>
