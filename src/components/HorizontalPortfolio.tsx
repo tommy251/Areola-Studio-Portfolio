@@ -54,7 +54,7 @@ const projects: PortfolioProject[] = [
     ],
     videos: [],
   },
-  {
+     {
     id: "habitat",
     title: "HABITAT",
     code: "N0.0002-25",
@@ -99,8 +99,9 @@ const projects: PortfolioProject[] = [
     ],
     videos: [],
   },
+
   {
-    id: "latropik",
+   id: "latropik",
     title: "LATROPIK",
     code: "N0.0003-25",
     category: "Branding",
@@ -135,6 +136,7 @@ const projects: PortfolioProject[] = [
     ],
     videos: [],
   },
+
   {
     id: "elchay",
     title: "ELCHAY",
@@ -163,6 +165,7 @@ const projects: PortfolioProject[] = [
     ],
     videos: [],
   },
+
   {
     id: "melstar",
     title: "MELSTAR",
@@ -182,7 +185,7 @@ const projects: PortfolioProject[] = [
     videos: [],
   },
   {
-    id: "riahrare",
+     id: "riahrare",
     title: "RIAHRARE",
     code: "N0.0006-25",
     category: "Social Media",
@@ -196,16 +199,14 @@ const projects: PortfolioProject[] = [
     ],
     videos: [],
   },
-  {
+ {
     id: "video-editing",
     title: "VIDEO EDITING",
     code: "N0.0007-25",
     category: "Video Editing",
-    // ✅ FIX: Use a real image as the thumbnail, not an .mp4
-    image: "/images/Video/video-thumbnail.jpg",
+    image: "/images/Video/elch vid 2.mp4",
     images: [],
     videos: [
-      "/images/Video/elch vid 2.mp4",
       "/images/Video/Hab Intro.mp4",
       "/images/Video/o yin M.mp4",
       "/images/Video/stack 6.mp4",
@@ -215,15 +216,11 @@ const projects: PortfolioProject[] = [
   },
 ];
 
-// Helper: check if a path is a video file
-const isVideo = (path: string) =>
-  /\.(mp4|webm|ogg|mov)$/i.test(path);
-
 const HorizontalPortfolio = () => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const sectionRef = useRef<HTMLElement>(null);
+  const scrollRef = useRef(null);
+  const sectionRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
+  const [selectedProject, setSelectedProject] = useState(null);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -232,9 +229,7 @@ const HorizontalPortfolio = () => {
     } else {
       document.body.style.overflow = "";
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    return () => { document.body.style.overflow = ""; };
   }, [selectedProject]);
 
   useEffect(() => {
@@ -269,32 +264,15 @@ const HorizontalPortfolio = () => {
               ({String(activeIndex + 1).padStart(2, "0")}/{String(projects.length).padStart(2, "0")})
             </span>
           </div>
-
           <div ref={scrollRef} className="flex overflow-x-hidden space-x-4 md:space-x-8">
-            {projects.map((project) => (
+            {projects.map((project, index) => (
               <motion.div
                 key={project.id}
                 className="flex-shrink-0 w-[90vw] md:w-[40vw] cursor-pointer"
                 onClick={() => setSelectedProject(project)}
               >
-                <div className="aspect-[4/3] mb-4 overflow-hidden rounded-xl bg-muted">
-                  {/* ✅ FIX: Handle video thumbnail vs image thumbnail */}
-                  {isVideo(project.image) ? (
-                    <video
-                      src={encodeURI(project.image)}
-                      className="w-full h-full object-cover"
-                      muted
-                      playsInline
-                      preload="metadata"
-                    />
-                  ) : (
-                    <img
-                      src={encodeURI(project.image)}
-                      alt={project.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  )}
+                <div className="aspect-[4/3] mb-4 overflow-hidden rounded-xl">
+                  <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
                 </div>
                 <div className="text-center">
                   <h3 className="text-xl font-semibold">{project.title}</h3>
@@ -308,13 +286,9 @@ const HorizontalPortfolio = () => {
           </div>
         </div>
       </section>
-
       <AnimatePresence>
         {selectedProject && (
-          <ProjectDetail
-            project={selectedProject}
-            onClose={() => setSelectedProject(null)}
-          />
+          <ProjectDetail project={selectedProject} onClose={() => setSelectedProject(null)} />
         )}
       </AnimatePresence>
     </>
