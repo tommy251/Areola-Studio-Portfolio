@@ -101,7 +101,6 @@ const projects: PortfolioProject[] = [
       "/images/habitat/hab prop 6.png",
     ],
     videos: [
-      "/images/Habitat/Habitat Vid Final.mp4",
     ],
   },
   {
@@ -109,7 +108,7 @@ const projects: PortfolioProject[] = [
     title: "LATROPIK",
     code: "N0.0003-25",
     category: "Branding",
-    image: "/images/Latropik/la tropik-02.jpg",
+    image: "/images/Melstar/Artboard 1.jpg",
     images: [
       "/images/latropik/la tropik-02.jpg",
       "/images/latropik/la tropik-03.jpg",
@@ -176,9 +175,8 @@ const projects: PortfolioProject[] = [
     title: "MELSTAR",
     code: "N0.0005-25",
     category: "Social Media",
-    image: "/images/Melstar/Artboard 4.jpg",
+    image: "/images/melstar/Artboard 1.jpg",
     images: [
-      "/images/melstar/Artboard 1.jpg",
       "/images/melstar/Artboard 2.jpg",
       "/images/melstar/Artboard 4.jpg",
       "/images/melstar/Artboard 5.jpg",
@@ -197,7 +195,6 @@ const projects: PortfolioProject[] = [
     category: "Social Media",
     image: "/images/Riah Rare/Artboard 1.jpg",
     images: [
-      "/images/Riah Rare/Artboard 1.jpg",
       "/images/Riah Rare/Artboard 2.jpg",
       "/images/Riah Rare/Artboard 3.jpg",
       "/images/Riah Rare/Artboard 5.jpg",
@@ -211,10 +208,9 @@ const projects: PortfolioProject[] = [
     title: "VIDEO EDITING",
     code: "N0.0007-25",
     category: "Video Editing",
-    image: "/images/Video/Hab Intro.mp4",
+    image: "/images/Video/elch vid 2.mp4",
     images: [],
     videos: [
-      "/images/Video/elch vid 2.mp4",
       "/images/Video/Hab Intro.mp4",
       "/images/Video/o yin M.mp4",
       "/images/Video/stack 6.mp4",
