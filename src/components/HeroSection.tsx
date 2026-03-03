@@ -2,10 +2,8 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useRef, useState, useCallback } from "react";
 
-// ─── Hero media — picked by largest file size (richest images) ──────────────
-// Vital HR-25=1.1MB  |  habitat Artboard2=3.7MB  |  latropik-07=9.8MB
-// ELCHAY Artboard19=552KB  |  Riah Rare Artboard1=811KB
-// Swap any src for a different image number if you prefer another shot
+// Best images picked by largest file size (richest, most detailed)
+// Swap any number to a different one if you prefer another shot
 const HERO_MEDIA: { type: "image" | "video"; src: string }[] = [
   { type: "image", src: "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-25.jpg" },
   { type: "image", src: "/images/habitat/Artboard%202.jpg" },
@@ -21,7 +19,7 @@ const HERO_MEDIA: { type: "image" | "video"; src: string }[] = [
   { type: "image", src: "/images/Riah%20Rare/Artboard%203.jpg" },
 ];
 
-// Tile shape alternates for Locatelli-style visual rhythm
+// Tile alternates shape for Locatelli-style visual rhythm
 const SIZES = [
   { w: 260, h: 190 },
   { w: 215, h: 290 },
@@ -36,7 +34,7 @@ const HeroSection = () => {
   const tileRef    = useRef<HTMLDivElement>(null);
   const videoRef   = useRef<HTMLVideoElement>(null);
 
-  // All positions kept in refs — NO setState for movement = no re-render lag
+  // Positions in refs — never setState for movement = zero re-render lag
   const cursorPos  = useRef({ x: -999, y: -999 });
   const tilePos    = useRef({ x: -999, y: -999 });
   const rafId      = useRef(0);
@@ -64,7 +62,7 @@ const HeroSection = () => {
     return () => cancelAnimationFrame(rafId.current);
   }, [animate]);
 
-  // Cycle media ONLY while cursor is inside hero — completely stops elsewhere
+  // Cycle media ONLY while cursor is inside hero — stops completely elsewhere
   useEffect(() => {
     if (!insideHero) {
       clearInterval(cycleTimer.current);
@@ -106,13 +104,14 @@ const HeroSection = () => {
     >
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-secondary/20" />
 
-      {/* ── Floating media tile ──────────────────────────────────────────────
-          position:absolute inside overflow:hidden section = can NEVER escape
-          into the works section below. Completely self-contained.          */}
+      {/* Floating media tile — position:absolute + overflow:hidden on section
+          means it is physically contained and cannot show outside hero       */}
       <div
         ref={tileRef}
         style={{
-          position: "absolute", top: 0, left: 0,
+          position: "absolute",
+          top: 0,
+          left: 0,
           width: tileSize.w,
           height: tileSize.h,
           pointerEvents: "none",
@@ -147,7 +146,7 @@ const HeroSection = () => {
           />
         )}
 
-        {/* Counter pill */}
+        {/* Clip counter */}
         <div style={{
           position: "absolute", bottom: 8, right: 10,
           color: "rgba(255,255,255,0.55)",
@@ -159,7 +158,7 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* ── Hero text — unchanged from original ── */}
+      {/* Hero text — same as original */}
       <div className="relative z-10 text-center px-6">
         <div className="overflow-hidden">
           <motion.h1

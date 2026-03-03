@@ -13,14 +13,12 @@ interface PortfolioProject {
   videos?: string[];
 }
 
-// ─── Best thumbnail images per project ─────────────────────────────────────
-// Picked by largest file size = richest, most detailed image
-// Vital HR: -25(1.1MB), -23(901KB), -26(715KB)
-// habitat:  Artboard2(3.7MB), Artboard1(2.6MB), broch mock(2.2MB)
-// latropik: -07(9.8MB), -04(9.2MB), -03(7.9MB), -06(2.2MB)
-// melstar:  Artboard4(316KB), Artboard1(293KB), Artboard6(245KB)
-// elchay:   Artboard19(552KB), Artboard14(451KB), Artboard1(428KB)
-// riahrare: Artboard1(811KB), Artboard3(662KB), Artboard2(618KB)
+interface CardProps {
+  project: PortfolioProject;
+  onClick: () => void;
+}
+
+// Best thumbnails per project picked by largest file size
 const THUMBS: Record<string, string[]> = {
   "vital-hr": [
     "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-25.jpg",
@@ -57,14 +55,36 @@ const THUMBS: Record<string, string[]> = {
     "/images/Riah%20Rare/Artboard%202.jpg",
     "/images/Riah%20Rare/Artboard%206.jpg",
   ],
-  "video-editing": [
-    "/images/melstar/Artboard%201.jpg",
-    "/images/ELCHAY%20Social%20Media/Artboard%201.jpg",
-    "/images/habitat/Artboard%201.jpg",
-  ],
 };
 
+// Video clips for the Video Editing thumbnail
+const VIDEO_THUMBS = [
+  "/images/Video/elch%20vid%202.mp4",
+  "/images/Video/Hab%20Intro.mp4",
+  "/images/Video/oyin%20M.mp4",
+  "/images/Video/stack%206.mp4",
+  "/images/Video/zero%20vid%20ad.mp4",
+  "/images/Video/stack%202%20final.mp4",
+];
+
+// VIDEO EDITING is first
 const projects: PortfolioProject[] = [
+  {
+    id: "video-editing",
+    title: "VIDEO EDITING",
+    code: "N0.0007-25",
+    category: "Video Editing",
+    image: "/images/melstar/Artboard%201.jpg",
+    images: [],
+    videos: [
+      "/images/Video/elch%20vid%202.mp4",
+      "/images/Video/Hab%20Intro.mp4",
+      "/images/Video/oyin%20M.mp4",
+      "/images/Video/stack%206.mp4",
+      "/images/Video/zero%20vid%20ad.mp4",
+      "/images/Video/stack%202%20final.mp4",
+    ],
+  },
   {
     id: "vital-hr",
     title: "VITAL HR",
@@ -133,8 +153,6 @@ const projects: PortfolioProject[] = [
       "/images/habitat/Habitat%20Prj-38.jpg",
       "/images/habitat/Habitat%20Prj-39.jpg",
       "/images/habitat/Habitat%20Prj-40.jpg",
-      "/images/habitat/hab%20green.png",
-      "/images/habitat/hab%20grey.png",
       "/images/habitat/IG%20Profic%20pic%20full%20name.jpg",
       "/images/habitat/IG%20prifile%20pic%204.jpg",
       "/images/habitat/IG%20profile%20pic%202.jpg",
@@ -243,39 +261,153 @@ const projects: PortfolioProject[] = [
     ],
     videos: [],
   },
-  {
-    id: "video-editing",
-    title: "VIDEO EDITING",
-    code: "N0.0007-25",
-    category: "Video Editing",
-    image: "/images/melstar/Artboard%201.jpg",
-    images: [],
-    videos: [
-      "/images/Video/elch%20vid%202.mp4",
-      "/images/Video/Hab%20Intro.mp4",
-      "/images/Video/oyin%20M.mp4",
-      "/images/Video/stack%206.mp4",
-      "/images/Video/zero%20vid%20ad.mp4",
-      "/images/Video/stack%202%20final.mp4",
-    ],
-  },
 ];
 
-// ─── Single project card with auto-scrolling thumbnail + lean toward cursor ─
-interface CardProps {
-  project: PortfolioProject;
-  onClick: () => void;
-}
-
-const ProjectCard = ({ project, onClick }: CardProps) => {
-  const thumbs      = THUMBS[project.id] ?? [project.image];
-  const [idx, setIdx]       = useState(0);
+// ─── VIDEO EDITING card — autoplay video thumbnail cycling through clips ────
+const VideoCard = ({ project, onClick }: CardProps) => {
+  const [vidIdx, setVidIdx]   = useState(0);
   const [hovered, setHovered] = useState(false);
   const [mouseX, setMouseX]   = useState(0.5);
-  const cardRef    = useRef<HTMLDivElement>(null);
-  const interval   = useRef<ReturnType<typeof setInterval>>();
+  const cardRef  = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const interval = useRef<ReturnType<typeof setInterval>>();
 
-  // Auto-scroll thumbnail images — pauses on hover
+  // Cycle to next clip every 4s
+  useEffect(() => {
+    interval.current = setInterval(() => {
+      setVidIdx(prev => (prev + 1) % VIDEO_THUMBS.length);
+    }, 4000);
+    return () => clearInterval(interval.current);
+  }, []);
+
+  // Reload + play whenever clip changes
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.load();
+    v.play().catch(() => {});
+  }, [vidIdx]);
+
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const r = cardRef.current.getBoundingClientRect();
+    setMouseX((e.clientX - r.left) / r.width);
+  };
+
+  const leanX   = hovered ? (mouseX - 0.5) * 24 : 0;
+  const leanRot = hovered ? (mouseX - 0.5) * 5  : 0;
+  const scale   = hovered ? 1.045 : 1;
+
+  return (
+    <div
+      className="flex-shrink-0 w-[90vw] md:w-[40vw] cursor-pointer select-none"
+      data-cursor-hover
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => { setHovered(false); setMouseX(0.5); }}
+      onMouseMove={onMouseMove}
+    >
+      <div
+        ref={cardRef}
+        style={{
+          transform: `translateX(${leanX}px) rotate(${leanRot}deg) scale(${scale})`,
+          transition: hovered
+            ? "transform 0.15s cubic-bezier(0.22,1,0.36,1)"
+            : "transform 0.6s cubic-bezier(0.22,1,0.36,1)",
+          willChange: "transform",
+        }}
+        className="aspect-[4/3] mb-4 overflow-hidden rounded-xl bg-muted relative"
+      >
+        {/* Autoplaying video */}
+        <video
+          ref={videoRef}
+          key={VIDEO_THUMBS[vidIdx]}
+          src={VIDEO_THUMBS[vidIdx]}
+          muted
+          loop
+          playsInline
+          autoPlay
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+
+        {/* Clip dot indicators */}
+        <div style={{
+          position: "absolute", bottom: 12, left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex", gap: 5, zIndex: 10,
+        }}>
+          {VIDEO_THUMBS.map((_, i) => (
+            <div key={i} style={{
+              width: i === vidIdx ? 20 : 5,
+              height: 4, borderRadius: 3,
+              background: i === vidIdx
+                ? "hsl(16,100%,50%)"
+                : "rgba(255,255,255,0.3)",
+              transition: "all 0.4s ease",
+            }} />
+          ))}
+        </div>
+
+        {/* Play badge top-right */}
+        <div style={{
+          position: "absolute", top: 14, right: 14,
+          width: 32, height: 32, borderRadius: "50%",
+          background: "rgba(0,0,0,0.45)",
+          backdropFilter: "blur(6px)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          zIndex: 10,
+        }}>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="white">
+            <polygon points="2,1 11,6 2,11" />
+          </svg>
+        </div>
+
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(160deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%)",
+          opacity: hovered ? 1 : 0,
+          transition: "opacity 0.3s ease",
+        }} />
+        <div style={{
+          position: "absolute", top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          opacity: hovered ? 1 : 0,
+          transition: "opacity 0.25s ease",
+          color: "#fff", fontSize: 11,
+          letterSpacing: "0.2em", textTransform: "uppercase",
+          fontWeight: 600, whiteSpace: "nowrap",
+          textShadow: "0 2px 12px rgba(0,0,0,0.6)",
+          pointerEvents: "none",
+        }}>
+          View Project →
+        </div>
+      </div>
+
+      <div className="text-center">
+        <h3
+          className="text-xl font-semibold transition-colors duration-300"
+          style={{ color: hovered ? "hsl(16,100%,50%)" : undefined }}
+        >
+          {project.title}
+        </h3>
+        <p className="text-muted-foreground text-sm">
+          {project.category}
+          <span className="ml-2 opacity-60">({project.code})</span>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// ─── Regular image card — auto-scroll + lean toward cursor ──────────────────
+const ProjectCard = ({ project, onClick }: CardProps) => {
+  const thumbs = THUMBS[project.id] ?? [project.image];
+  const [idx, setIdx]         = useState(0);
+  const [hovered, setHovered] = useState(false);
+  const [mouseX, setMouseX]   = useState(0.5);
+  const cardRef  = useRef<HTMLDivElement>(null);
+  const interval = useRef<ReturnType<typeof setInterval>>();
+
   useEffect(() => {
     if (hovered || thumbs.length <= 1) {
       clearInterval(interval.current);
@@ -293,7 +425,6 @@ const ProjectCard = ({ project, onClick }: CardProps) => {
     setMouseX((e.clientX - r.left) / r.width);
   };
 
-  // Lean toward cursor side
   const leanX   = hovered ? (mouseX - 0.5) * 24 : 0;
   const leanRot = hovered ? (mouseX - 0.5) * 5  : 0;
   const scale   = hovered ? 1.045 : 1;
@@ -307,7 +438,6 @@ const ProjectCard = ({ project, onClick }: CardProps) => {
       onMouseLeave={() => { setHovered(false); setMouseX(0.5); }}
       onMouseMove={onMouseMove}
     >
-      {/* Image wrapper — lean transform applied here */}
       <div
         ref={cardRef}
         style={{
@@ -319,7 +449,6 @@ const ProjectCard = ({ project, onClick }: CardProps) => {
         }}
         className="aspect-[4/3] mb-4 overflow-hidden rounded-xl bg-muted relative"
       >
-        {/* Crossfading thumbnail images */}
         {thumbs.map((src, i) => (
           <img
             key={src}
@@ -334,7 +463,6 @@ const ProjectCard = ({ project, onClick }: CardProps) => {
           />
         ))}
 
-        {/* Orange dot progress indicators */}
         <div style={{
           position: "absolute", bottom: 12, left: "50%",
           transform: "translateX(-50%)",
@@ -352,7 +480,6 @@ const ProjectCard = ({ project, onClick }: CardProps) => {
           ))}
         </div>
 
-        {/* Hover gradient overlay */}
         <div style={{
           position: "absolute", inset: 0,
           background: "linear-gradient(160deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%)",
@@ -360,7 +487,6 @@ const ProjectCard = ({ project, onClick }: CardProps) => {
           transition: "opacity 0.3s ease",
         }} />
 
-        {/* "View Project" label */}
         <div style={{
           position: "absolute", top: "50%", left: "50%",
           transform: "translate(-50%, -50%)",
@@ -376,7 +502,6 @@ const ProjectCard = ({ project, onClick }: CardProps) => {
         </div>
       </div>
 
-      {/* Label */}
       <div className="text-center">
         <h3
           className="text-xl font-semibold transition-colors duration-300"
@@ -397,8 +522,8 @@ const ProjectCard = ({ project, onClick }: CardProps) => {
 const HorizontalPortfolio = () => {
   const scrollRef  = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const [activeIndex, setActiveIndex]           = useState(0);
-  const [selectedProject, setSelectedProject]   = useState<PortfolioProject | null>(null);
+  const [activeIndex, setActiveIndex]         = useState(0);
+  const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -412,13 +537,13 @@ const HorizontalPortfolio = () => {
     if (!section || !container) return;
 
     const onScroll = () => {
-      const rect        = section.getBoundingClientRect();
-      const sectionTop  = -rect.top;
-      const maxHeight   = section.offsetHeight - window.innerHeight;
-      const progress    = Math.max(0, Math.min(1, sectionTop / maxHeight));
-      const maxScroll   = container.scrollWidth - container.clientWidth;
+      const rect      = section.getBoundingClientRect();
+      const top       = -rect.top;
+      const maxHeight = section.offsetHeight - window.innerHeight;
+      const progress  = Math.max(0, Math.min(1, top / maxHeight));
+      const maxScroll = container.scrollWidth - container.clientWidth;
       container.scrollLeft = progress * maxScroll;
-      const cardW       = container.clientWidth * 0.42;
+      const cardW = container.clientWidth * 0.42;
       setActiveIndex(Math.min(Math.round(container.scrollLeft / cardW), projects.length - 1));
     };
 
@@ -430,7 +555,6 @@ const HorizontalPortfolio = () => {
     <>
       <section ref={sectionRef} className="relative h-[300vh] bg-background">
         <div className="sticky top-0 h-screen flex flex-col justify-center px-8 md:px-16">
-
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold">{t("selectedWorks")}</h2>
             <span className="text-xl md:text-2xl opacity-60">
@@ -438,28 +562,21 @@ const HorizontalPortfolio = () => {
             </span>
           </div>
 
-          {/* Horizontal scroll row — no pointer reel here, only cursor ring */}
-          <div
-            ref={scrollRef}
-            className="flex overflow-x-hidden space-x-4 md:space-x-8"
-          >
-            {projects.map(p => (
-              <ProjectCard
-                key={p.id}
-                project={p}
-                onClick={() => setSelectedProject(p)}
-              />
-            ))}
+          <div ref={scrollRef} className="flex overflow-x-hidden space-x-4 md:space-x-8">
+            {projects.map(p =>
+              p.id === "video-editing" ? (
+                <VideoCard key={p.id} project={p} onClick={() => setSelectedProject(p)} />
+              ) : (
+                <ProjectCard key={p.id} project={p} onClick={() => setSelectedProject(p)} />
+              )
+            )}
           </div>
         </div>
       </section>
 
       <AnimatePresence>
         {selectedProject && (
-          <ProjectDetail
-            project={selectedProject}
-            onClose={() => setSelectedProject(null)}
-          />
+          <ProjectDetail project={selectedProject} onClose={() => setSelectedProject(null)} />
         )}
       </AnimatePresence>
     </>
