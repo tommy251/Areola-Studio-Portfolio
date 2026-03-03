@@ -2,47 +2,59 @@ import { motion } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEffect, useRef, useState, useCallback } from "react";
 
-// ─── Best hero images pulled from your actual project images ───────────────
-const HERO_MEDIA = [
-  { type: "image", src: "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-45.jpg" },
-  { type: "image", src: "/images/habitat/Habitat%20Prj-24.jpg" },
-  { type: "image", src: "/images/latropik/la%20tropik-03.jpg" },
-  { type: "image", src: "/images/ELCHAY%20Social%20Media/Artboard%201.jpg" },
+// ─── Hero media — picked by largest file size (richest images) ──────────────
+// Vital HR-25=1.1MB  |  habitat Artboard2=3.7MB  |  latropik-07=9.8MB
+// ELCHAY Artboard19=552KB  |  Riah Rare Artboard1=811KB
+// Swap any src for a different image number if you prefer another shot
+const HERO_MEDIA: { type: "image" | "video"; src: string }[] = [
+  { type: "image", src: "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-25.jpg" },
+  { type: "image", src: "/images/habitat/Artboard%202.jpg" },
+  { type: "image", src: "/images/latropik/la%20tropik-07.jpg" },
+  { type: "image", src: "/images/ELCHAY%20Social%20Media/Artboard%2019.jpg" },
   { type: "image", src: "/images/melstar/Artboard%204.jpg" },
   { type: "image", src: "/images/Riah%20Rare/Artboard%201.jpg" },
   { type: "video", src: "/images/Video/elch%20vid%202.mp4" },
-  { type: "image", src: "/images/habitat/Habitat%20Prj-26.jpg" },
-  { type: "image", src: "/images/latropik/la%20tropik-07.jpg" },
+  { type: "image", src: "/images/latropik/la%20tropik-04.jpg" },
+  { type: "image", src: "/images/habitat/Artboard%201.jpg" },
   { type: "video", src: "/images/Video/Hab%20Intro.mp4" },
+  { type: "image", src: "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-23.jpg" },
+  { type: "image", src: "/images/Riah%20Rare/Artboard%203.jpg" },
+];
+
+// Tile shape alternates for Locatelli-style visual rhythm
+const SIZES = [
+  { w: 260, h: 190 },
+  { w: 215, h: 290 },
+  { w: 305, h: 200 },
+  { w: 245, h: 245 },
 ];
 
 const HeroSection = () => {
   const { t } = useLanguage();
 
-  // ── Cursor reel state ──────────────────────────────────────────────────────
-  const containerRef = useRef<HTMLDivElement>(null);
-  const tileRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const tileRef    = useRef<HTMLDivElement>(null);
+  const videoRef   = useRef<HTMLVideoElement>(null);
 
-  const cursorPos = useRef({ x: 0, y: 0 });
-  const tilePos = useRef({ x: 0, y: 0 });
-  const rafId = useRef<number>(0);
-
-  const [mediaIndex, setMediaIndex] = useState(0);
-  const [tileVisible, setTileVisible] = useState(false);
-  const [insideHero, setInsideHero] = useState(false);
-  // tile size alternates for visual rhythm like Locatelli
-  const [tileSize, setTileSize] = useState({ w: 260, h: 185 });
-
-  const idleTimer = useRef<ReturnType<typeof setTimeout>>();
+  // All positions kept in refs — NO setState for movement = no re-render lag
+  const cursorPos  = useRef({ x: -999, y: -999 });
+  const tilePos    = useRef({ x: -999, y: -999 });
+  const rafId      = useRef(0);
+  const idleTimer  = useRef<ReturnType<typeof setTimeout>>();
   const cycleTimer = useRef<ReturnType<typeof setInterval>>();
 
-  // Smooth lag animation loop
+  const [mediaIndex,  setMediaIndex]  = useState(0);
+  const [tileVisible, setTileVisible] = useState(false);
+  const [insideHero,  setInsideHero]  = useState(false);
+  const [sizeIdx,     setSizeIdx]     = useState(0);
+
+  // Pure RAF lerp — tile tracks cursor independently of React render cycle
   const animate = useCallback(() => {
-    tilePos.current.x += (cursorPos.current.x - tilePos.current.x) * 0.1;
-    tilePos.current.y += (cursorPos.current.y - tilePos.current.y) * 0.1;
+    tilePos.current.x += (cursorPos.current.x - tilePos.current.x) * 0.08;
+    tilePos.current.y += (cursorPos.current.y - tilePos.current.y) * 0.08;
     if (tileRef.current) {
-      tileRef.current.style.transform = `translate(${tilePos.current.x}px, ${tilePos.current.y}px) translate(-50%, -50%)`;
+      tileRef.current.style.transform =
+        `translate(${tilePos.current.x}px,${tilePos.current.y}px) translate(-50%,-50%)`;
     }
     rafId.current = requestAnimationFrame(animate);
   }, []);
@@ -52,27 +64,20 @@ const HeroSection = () => {
     return () => cancelAnimationFrame(rafId.current);
   }, [animate]);
 
-  // Cycle through media while inside hero
+  // Cycle media ONLY while cursor is inside hero — completely stops elsewhere
   useEffect(() => {
     if (!insideHero) {
       clearInterval(cycleTimer.current);
       return;
     }
     cycleTimer.current = setInterval(() => {
-      setMediaIndex((prev) => (prev + 1) % HERO_MEDIA.length);
-      // randomise tile size slightly each cycle
-      const sizes = [
-        { w: 260, h: 185 },
-        { w: 220, h: 290 },
-        { w: 310, h: 200 },
-        { w: 240, h: 240 },
-      ];
-      setTileSize(sizes[Math.floor(Math.random() * sizes.length)]);
-    }, 1300);
+      setMediaIndex(prev => (prev + 1) % HERO_MEDIA.length);
+      setSizeIdx(prev    => (prev + 1) % SIZES.length);
+    }, 1400);
     return () => clearInterval(cycleTimer.current);
   }, [insideHero]);
 
-  // Auto-play when video tile becomes active
+  // Auto-play video tiles
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.load();
@@ -80,41 +85,46 @@ const HeroSection = () => {
     }
   }, [mediaIndex]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = containerRef.current!.getBoundingClientRect();
+  const handleMouseMove = (e: React.MouseEvent) => {
+    const rect = sectionRef.current!.getBoundingClientRect();
     cursorPos.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     setTileVisible(true);
     clearTimeout(idleTimer.current);
-    idleTimer.current = setTimeout(() => setTileVisible(false), 1000);
+    idleTimer.current = setTimeout(() => setTileVisible(false), 900);
   };
 
-  const current = HERO_MEDIA[mediaIndex];
+  const current  = HERO_MEDIA[mediaIndex];
+  const tileSize = SIZES[sizeIdx];
 
   return (
     <section
-      ref={containerRef}
+      ref={sectionRef}
+      onMouseMove={handleMouseMove}
       onMouseEnter={() => setInsideHero(true)}
       onMouseLeave={() => { setInsideHero(false); setTileVisible(false); }}
       className="relative flex h-screen flex-col items-center justify-center overflow-hidden cursor-none"
     >
       <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-secondary/20" />
 
-      {/* ── Locatelli-style floating media tile ── */}
+      {/* ── Floating media tile ──────────────────────────────────────────────
+          position:absolute inside overflow:hidden section = can NEVER escape
+          into the works section below. Completely self-contained.          */}
       <div
         ref={tileRef}
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
+          position: "absolute", top: 0, left: 0,
           width: tileSize.w,
           height: tileSize.h,
           pointerEvents: "none",
           zIndex: 20,
           opacity: tileVisible ? 1 : 0,
-          transition: "opacity 0.4s ease, width 0.5s cubic-bezier(0.22,1,0.36,1), height 0.5s cubic-bezier(0.22,1,0.36,1)",
+          transition:
+            "opacity 0.35s ease," +
+            "width 0.5s cubic-bezier(0.22,1,0.36,1)," +
+            "height 0.5s cubic-bezier(0.22,1,0.36,1)",
           borderRadius: 2,
           overflow: "hidden",
-          boxShadow: "0 24px 80px rgba(0,0,0,0.6)",
+          boxShadow: "0 24px 80px rgba(0,0,0,0.75)",
           willChange: "transform",
         }}
       >
@@ -137,17 +147,19 @@ const HeroSection = () => {
           />
         )}
 
-        {/* thin counter — Locatelli-style */}
+        {/* Counter pill */}
         <div style={{
           position: "absolute", bottom: 8, right: 10,
-          color: "rgba(255,255,255,0.55)", fontSize: 10,
-          letterSpacing: "0.12em", fontFamily: "monospace",
+          color: "rgba(255,255,255,0.55)",
+          fontSize: 10, letterSpacing: "0.12em", fontFamily: "monospace",
         }}>
-          {String(mediaIndex + 1).padStart(2, "0")}&nbsp;/&nbsp;{String(HERO_MEDIA.length).padStart(2, "0")}
+          {String(mediaIndex + 1).padStart(2, "0")}
+          {" / "}
+          {String(HERO_MEDIA.length).padStart(2, "0")}
         </div>
       </div>
 
-      {/* ── Hero text ── */}
+      {/* ── Hero text — unchanged from original ── */}
       <div className="relative z-10 text-center px-6">
         <div className="overflow-hidden">
           <motion.h1

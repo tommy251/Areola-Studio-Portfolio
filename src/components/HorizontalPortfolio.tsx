@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProjectDetail from "./ProjectDetail";
@@ -13,55 +13,54 @@ interface PortfolioProject {
   videos?: string[];
 }
 
-// ─── Best 4-5 images per project for the auto-scroll thumbnail ──────────────
-// Ordered: most visually striking first
-const THUMBNAIL_PICKS: Record<string, string[]> = {
+// ─── Best thumbnail images per project ─────────────────────────────────────
+// Picked by largest file size = richest, most detailed image
+// Vital HR: -25(1.1MB), -23(901KB), -26(715KB)
+// habitat:  Artboard2(3.7MB), Artboard1(2.6MB), broch mock(2.2MB)
+// latropik: -07(9.8MB), -04(9.2MB), -03(7.9MB), -06(2.2MB)
+// melstar:  Artboard4(316KB), Artboard1(293KB), Artboard6(245KB)
+// elchay:   Artboard19(552KB), Artboard14(451KB), Artboard1(428KB)
+// riahrare: Artboard1(811KB), Artboard3(662KB), Artboard2(618KB)
+const THUMBS: Record<string, string[]> = {
   "vital-hr": [
-    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-45.jpg",
-    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-32.jpg",
-    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-28.jpg",
+    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-25.jpg",
+    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-23.jpg",
+    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-26.jpg",
     "/images/Vital%20HR%20SM%20Banner/Artboard%201.jpg",
-    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-44.jpg",
   ],
   "habitat": [
-    "/images/habitat/Habitat%20Prj-24.jpg",
-    "/images/habitat/Habitat%20Prj-30.jpg",
-    "/images/habitat/Habitat%20Prj-34.jpg",
-    "/images/habitat/broch%20mock.jpg",
+    "/images/habitat/Artboard%202.jpg",
     "/images/habitat/Artboard%201.jpg",
+    "/images/habitat/broch%20mock.jpg",
   ],
   "latropik": [
-    "/images/latropik/la%20tropik-03.jpg",
     "/images/latropik/la%20tropik-07.jpg",
-    "/images/latropik/la%20tropik-12.jpg",
-    "/images/latropik/la%20tropik-17.jpg",
-    "/images/latropik/trop%20ban.jpg",
+    "/images/latropik/la%20tropik-04.jpg",
+    "/images/latropik/la%20tropik-03.jpg",
+    "/images/latropik/la%20tropik-06.jpg",
   ],
   "elchay": [
-    "/images/ELCHAY%20Social%20Media/Artboard%201.jpg",
-    "/images/ELCHAY%20Social%20Media/Artboard%204.jpg",
-    "/images/ELCHAY%20Social%20Media/Artboard%207.jpg",
-    "/images/ELCHAY%20Social%20Media/Artboard%2014.jpg",
     "/images/ELCHAY%20Social%20Media/Artboard%2019.jpg",
+    "/images/ELCHAY%20Social%20Media/Artboard%2014.jpg",
+    "/images/ELCHAY%20Social%20Media/Artboard%201.jpg",
+    "/images/ELCHAY%20Social%20Media/Artboard%2011.jpg",
   ],
   "melstar": [
     "/images/melstar/Artboard%204.jpg",
+    "/images/melstar/Artboard%201.jpg",
     "/images/melstar/Artboard%206.jpg",
-    "/images/melstar/Artboard%208.jpg",
-    "/images/melstar/Artboard%2010.jpg",
-    "/images/melstar/Artboard%202.jpg",
+    "/images/melstar/Artboard%207.jpg",
   ],
   "riahrare": [
     "/images/Riah%20Rare/Artboard%201.jpg",
     "/images/Riah%20Rare/Artboard%203.jpg",
-    "/images/Riah%20Rare/Artboard%205.jpg",
-    "/images/Riah%20Rare/Artboard%207.jpg",
     "/images/Riah%20Rare/Artboard%202.jpg",
+    "/images/Riah%20Rare/Artboard%206.jpg",
   ],
   "video-editing": [
     "/images/melstar/Artboard%201.jpg",
-    "/images/ELCHAY%20Social%20Media/Artboard%202.jpg",
-    "/images/habitat/Habitat%20Prj-22.jpg",
+    "/images/ELCHAY%20Social%20Media/Artboard%201.jpg",
+    "/images/habitat/Artboard%201.jpg",
   ],
 };
 
@@ -71,10 +70,11 @@ const projects: PortfolioProject[] = [
     title: "VITAL HR",
     code: "N0.0001-25",
     category: "Branding",
-    image: "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-45.jpg",
+    image: "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-25.jpg",
     images: [
       "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-23.jpg",
       "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-24.jpg",
+      "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-25.jpg",
       "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-26.jpg",
       "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-27.jpg",
       "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-28.jpg",
@@ -108,8 +108,11 @@ const projects: PortfolioProject[] = [
     title: "HABITAT",
     code: "N0.0002-25",
     category: "Branding",
-    image: "/images/habitat/Habitat%20Prj-24.jpg",
+    image: "/images/habitat/Artboard%202.jpg",
     images: [
+      "/images/habitat/Artboard%201.jpg",
+      "/images/habitat/Artboard%202.jpg",
+      "/images/habitat/broch%20mock.jpg",
       "/images/habitat/Habitat%20Prj-21.jpg",
       "/images/habitat/Habitat%20Prj-22.jpg",
       "/images/habitat/Habitat%20Prj-23.jpg",
@@ -132,14 +135,6 @@ const projects: PortfolioProject[] = [
       "/images/habitat/Habitat%20Prj-40.jpg",
       "/images/habitat/hab%20green.png",
       "/images/habitat/hab%20grey.png",
-      "/images/habitat/hab%20icon%20green.png",
-      "/images/habitat/hab%20icon%20grey.png",
-      "/images/habitat/hab%20icon%20red.png",
-      "/images/habitat/pot%20plant%20hab.jpg",
-      "/images/habitat/hab%20sec%20logo.png",
-      "/images/habitat/broch%20mock.jpg",
-      "/images/habitat/Artboard%201.jpg",
-      "/images/habitat/Artboard%202.jpg",
       "/images/habitat/IG%20Profic%20pic%20full%20name.jpg",
       "/images/habitat/IG%20prifile%20pic%204.jpg",
       "/images/habitat/IG%20profile%20pic%202.jpg",
@@ -153,7 +148,7 @@ const projects: PortfolioProject[] = [
     title: "LATROPIK",
     code: "N0.0003-25",
     category: "Branding",
-    image: "/images/latropik/la%20tropik-03.jpg",
+    image: "/images/latropik/la%20tropik-07.jpg",
     images: [
       "/images/latropik/la%20tropik-02.jpg",
       "/images/latropik/la%20tropik-03.jpg",
@@ -189,8 +184,9 @@ const projects: PortfolioProject[] = [
     title: "ELCHAY",
     code: "N0.0004-25",
     category: "Social Media",
-    image: "/images/ELCHAY%20Social%20Media/Artboard%201.jpg",
+    image: "/images/ELCHAY%20Social%20Media/Artboard%2019.jpg",
     images: [
+      "/images/ELCHAY%20Social%20Media/Artboard%201.jpg",
       "/images/ELCHAY%20Social%20Media/Artboard%202.jpg",
       "/images/ELCHAY%20Social%20Media/Artboard%203.jpg",
       "/images/ELCHAY%20Social%20Media/Artboard%204.jpg",
@@ -217,7 +213,9 @@ const projects: PortfolioProject[] = [
     category: "Social Media",
     image: "/images/melstar/Artboard%204.jpg",
     images: [
+      "/images/melstar/Artboard%201.jpg",
       "/images/melstar/Artboard%202.jpg",
+      "/images/melstar/Artboard%203.jpg",
       "/images/melstar/Artboard%204.jpg",
       "/images/melstar/Artboard%205.jpg",
       "/images/melstar/Artboard%206.jpg",
@@ -235,8 +233,10 @@ const projects: PortfolioProject[] = [
     category: "Social Media",
     image: "/images/Riah%20Rare/Artboard%201.jpg",
     images: [
+      "/images/Riah%20Rare/Artboard%201.jpg",
       "/images/Riah%20Rare/Artboard%202.jpg",
       "/images/Riah%20Rare/Artboard%203.jpg",
+      "/images/Riah%20Rare/Artboard%204.jpg",
       "/images/Riah%20Rare/Artboard%205.jpg",
       "/images/Riah%20Rare/Artboard%206.jpg",
       "/images/Riah%20Rare/Artboard%207.jpg",
@@ -261,166 +261,144 @@ const projects: PortfolioProject[] = [
   },
 ];
 
-// ─── Auto-scrolling thumbnail card ─────────────────────────────────────────
-interface ThumbnailCardProps {
+// ─── Single project card with auto-scrolling thumbnail + lean toward cursor ─
+interface CardProps {
   project: PortfolioProject;
   onClick: () => void;
 }
 
-const ThumbnailCard = ({ project, onClick }: ThumbnailCardProps) => {
-  const thumbs = THUMBNAIL_PICKS[project.id] ?? [project.image];
-  const [imgIndex, setImgIndex] = useState(0);
+const ProjectCard = ({ project, onClick }: CardProps) => {
+  const thumbs      = THUMBS[project.id] ?? [project.image];
+  const [idx, setIdx]       = useState(0);
   const [hovered, setHovered] = useState(false);
-  const [mouseXRatio, setMouseXRatio] = useState(0.5);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const [mouseX, setMouseX]   = useState(0.5);
+  const cardRef    = useRef<HTMLDivElement>(null);
+  const interval   = useRef<ReturnType<typeof setInterval>>();
 
-  // Auto-scroll thumbnails, pause on hover
+  // Auto-scroll thumbnail images — pauses on hover
   useEffect(() => {
     if (hovered || thumbs.length <= 1) {
-      clearInterval(intervalRef.current);
+      clearInterval(interval.current);
       return;
     }
-    intervalRef.current = setInterval(() => {
-      setImgIndex((prev) => (prev + 1) % thumbs.length);
+    interval.current = setInterval(() => {
+      setIdx(prev => (prev + 1) % thumbs.length);
     }, 1700);
-    return () => clearInterval(intervalRef.current);
+    return () => clearInterval(interval.current);
   }, [hovered, thumbs.length]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    setMouseXRatio((e.clientX - rect.left) / rect.width);
+    const r = cardRef.current.getBoundingClientRect();
+    setMouseX((e.clientX - r.left) / r.width);
   };
 
-  // Lean toward cursor
-  const leanX = hovered ? (mouseXRatio - 0.5) * 22 : 0;
-  const leanRotate = hovered ? (mouseXRatio - 0.5) * 5 : 0;
-  const leanScale = hovered ? 1.045 : 1;
+  // Lean toward cursor side
+  const leanX   = hovered ? (mouseX - 0.5) * 24 : 0;
+  const leanRot = hovered ? (mouseX - 0.5) * 5  : 0;
+  const scale   = hovered ? 1.045 : 1;
 
   return (
-    <motion.div
-      key={project.id}
-      className="flex-shrink-0 w-[90vw] md:w-[40vw] cursor-pointer"
+    <div
+      className="flex-shrink-0 w-[90vw] md:w-[40vw] cursor-pointer select-none"
       data-cursor-hover
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => { setHovered(false); setMouseXRatio(0.5); }}
-      onMouseMove={handleMouseMove}
+      onMouseLeave={() => { setHovered(false); setMouseX(0.5); }}
+      onMouseMove={onMouseMove}
     >
-      {/* Thumbnail wrapper */}
+      {/* Image wrapper — lean transform applied here */}
       <div
         ref={cardRef}
         style={{
-          transform: `translateX(${leanX}px) rotate(${leanRotate}deg) scale(${leanScale})`,
+          transform: `translateX(${leanX}px) rotate(${leanRot}deg) scale(${scale})`,
           transition: hovered
             ? "transform 0.15s cubic-bezier(0.22,1,0.36,1)"
-            : "transform 0.55s cubic-bezier(0.22,1,0.36,1)",
+            : "transform 0.6s cubic-bezier(0.22,1,0.36,1)",
           willChange: "transform",
         }}
         className="aspect-[4/3] mb-4 overflow-hidden rounded-xl bg-muted relative"
       >
-        {/* Crossfading images */}
+        {/* Crossfading thumbnail images */}
         {thumbs.map((src, i) => (
           <img
             key={src}
             src={src}
-            alt={`${project.title} ${i}`}
+            alt={`${project.title} ${i + 1}`}
             className="absolute inset-0 w-full h-full object-cover"
             style={{
-              opacity: i === imgIndex ? 1 : 0,
-              transition: "opacity 0.75s ease",
+              opacity: i === idx ? 1 : 0,
+              transition: "opacity 0.8s ease",
             }}
             loading="lazy"
           />
         ))}
 
-        {/* Dot progress bar */}
-        <div
-          style={{
-            position: "absolute",
-            bottom: 12,
-            left: "50%",
-            transform: "translateX(-50%)",
-            display: "flex",
-            gap: 5,
-            zIndex: 10,
-          }}
-        >
+        {/* Orange dot progress indicators */}
+        <div style={{
+          position: "absolute", bottom: 12, left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex", gap: 5, zIndex: 10,
+        }}>
           {thumbs.map((_, i) => (
-            <div
-              key={i}
-              style={{
-                width: i === imgIndex ? 18 : 5,
-                height: 4,
-                borderRadius: 3,
-                background: i === imgIndex ? "hsl(16,100%,50%)" : "rgba(255,255,255,0.35)",
-                transition: "all 0.4s ease",
-              }}
-            />
+            <div key={i} style={{
+              width: i === idx ? 20 : 5,
+              height: 4, borderRadius: 3,
+              background: i === idx
+                ? "hsl(16,100%,50%)"
+                : "rgba(255,255,255,0.3)",
+              transition: "all 0.4s ease",
+            }} />
           ))}
         </div>
 
-        {/* Hover overlay with arrow */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(135deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.45) 100%)",
-            opacity: hovered ? 1 : 0,
-            transition: "opacity 0.3s ease",
-          }}
-        />
+        {/* Hover gradient overlay */}
+        <div style={{
+          position: "absolute", inset: 0,
+          background: "linear-gradient(160deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.5) 100%)",
+          opacity: hovered ? 1 : 0,
+          transition: "opacity 0.3s ease",
+        }} />
 
-        {/* "View project" label */}
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            opacity: hovered ? 1 : 0,
-            transition: "opacity 0.25s ease",
-            color: "#fff",
-            fontSize: 11,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            fontWeight: 600,
-            whiteSpace: "nowrap",
-            textShadow: "0 2px 12px rgba(0,0,0,0.6)",
-            pointerEvents: "none",
-          }}
-        >
+        {/* "View Project" label */}
+        <div style={{
+          position: "absolute", top: "50%", left: "50%",
+          transform: "translate(-50%, -50%)",
+          opacity: hovered ? 1 : 0,
+          transition: "opacity 0.25s ease",
+          color: "#fff", fontSize: 11,
+          letterSpacing: "0.2em", textTransform: "uppercase",
+          fontWeight: 600, whiteSpace: "nowrap",
+          textShadow: "0 2px 12px rgba(0,0,0,0.6)",
+          pointerEvents: "none",
+        }}>
           View Project →
         </div>
       </div>
 
-      {/* Card label */}
+      {/* Label */}
       <div className="text-center">
         <h3
-          className="text-xl font-semibold"
-          style={{
-            color: hovered ? "hsl(16,100%,50%)" : undefined,
-            transition: "color 0.3s ease",
-          }}
+          className="text-xl font-semibold transition-colors duration-300"
+          style={{ color: hovered ? "hsl(16,100%,50%)" : undefined }}
         >
           {project.title}
         </h3>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           {project.category}
-          <span className="ml-2">({project.code})</span>
+          <span className="ml-2 opacity-60">({project.code})</span>
         </p>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
-// ─── Main HorizontalPortfolio ───────────────────────────────────────────────
+// ─── Main component ──────────────────────────────────────────────────────────
 const HorizontalPortfolio = () => {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef  = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
+  const [activeIndex, setActiveIndex]           = useState(0);
+  const [selectedProject, setSelectedProject]   = useState<PortfolioProject | null>(null);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -429,44 +407,47 @@ const HorizontalPortfolio = () => {
   }, [selectedProject]);
 
   useEffect(() => {
-    const section = sectionRef.current;
-    const scrollContainer = scrollRef.current;
-    if (!section || !scrollContainer) return;
+    const section   = sectionRef.current;
+    const container = scrollRef.current;
+    if (!section || !container) return;
 
-    const handleScroll = () => {
-      const rect = section.getBoundingClientRect();
-      const sectionTop = -rect.top;
-      const sectionHeight = section.offsetHeight - window.innerHeight;
-      const progress = Math.max(0, Math.min(1, sectionTop / sectionHeight));
-      const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-      scrollContainer.scrollLeft = progress * maxScroll;
-
-      const cardWidth = scrollContainer.clientWidth * 0.42;
-      const newActive = Math.round(scrollContainer.scrollLeft / cardWidth);
-      setActiveIndex(Math.min(newActive, projects.length - 1));
+    const onScroll = () => {
+      const rect        = section.getBoundingClientRect();
+      const sectionTop  = -rect.top;
+      const maxHeight   = section.offsetHeight - window.innerHeight;
+      const progress    = Math.max(0, Math.min(1, sectionTop / maxHeight));
+      const maxScroll   = container.scrollWidth - container.clientWidth;
+      container.scrollLeft = progress * maxScroll;
+      const cardW       = container.clientWidth * 0.42;
+      setActiveIndex(Math.min(Math.round(container.scrollLeft / cardW), projects.length - 1));
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <>
       <section ref={sectionRef} className="relative h-[300vh] bg-background">
         <div className="sticky top-0 h-screen flex flex-col justify-center px-8 md:px-16">
+
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-2xl md:text-3xl font-bold">{t("selectedWorks")}</h2>
-            <span className="text-xl md:text-2xl">
-              ({String(activeIndex + 1).padStart(2, "0")}/{String(projects.length).padStart(2, "0")})
+            <span className="text-xl md:text-2xl opacity-60">
+              ({String(activeIndex + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")})
             </span>
           </div>
 
-          <div ref={scrollRef} className="flex overflow-x-hidden space-x-4 md:space-x-8">
-            {projects.map((project) => (
-              <ThumbnailCard
-                key={project.id}
-                project={project}
-                onClick={() => setSelectedProject(project)}
+          {/* Horizontal scroll row — no pointer reel here, only cursor ring */}
+          <div
+            ref={scrollRef}
+            className="flex overflow-x-hidden space-x-4 md:space-x-8"
+          >
+            {projects.map(p => (
+              <ProjectCard
+                key={p.id}
+                project={p}
+                onClick={() => setSelectedProject(p)}
               />
             ))}
           </div>
@@ -475,7 +456,10 @@ const HorizontalPortfolio = () => {
 
       <AnimatePresence>
         {selectedProject && (
-          <ProjectDetail project={selectedProject} onClose={() => setSelectedProject(null)} />
+          <ProjectDetail
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
+          />
         )}
       </AnimatePresence>
     </>
