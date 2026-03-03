@@ -93,7 +93,6 @@ const HeroSection = () => {
   return (
     <section
       ref={containerRef}
-      onMouseMove={handleMouseMove}
       onMouseEnter={() => setInsideHero(true)}
       onMouseLeave={() => { setInsideHero(false); setTileVisible(false); }}
       className="relative flex h-screen flex-col items-center justify-center overflow-hidden cursor-none"

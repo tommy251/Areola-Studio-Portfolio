@@ -1,130 +1,66 @@
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 const CustomCursor = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isHovering, setIsHovering] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [label, setLabel] = useState("");
-
-  // Lagging ring position (RAF-based for smoothness)
-  const ringPos = useRef({ x: 0, y: 0 });
-  const dotPos = useRef({ x: 0, y: 0 });
-  const rafId = useRef<number>(0);
+  const dotRef  = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const animate = () => {
-      ringPos.current.x += (dotPos.current.x - ringPos.current.x) * 0.12;
-      ringPos.current.y += (dotPos.current.y - ringPos.current.y) * 0.12;
-      if (ringRef.current) {
-        const size = isHovering ? 56 : 36;
-        ringRef.current.style.transform = `translate(${ringPos.current.x - size / 2}px, ${ringPos.current.y - size / 2}px)`;
-      }
-      rafId.current = requestAnimationFrame(animate);
+    if (typeof window !== "undefined" && "ontouchstart" in window) return;
+    const dot  = dotRef.current;
+    const ring = ringRef.current;
+    if (!dot || !ring) return;
+
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    let hovering = false, visible = false, raf = 0;
+
+    const onMove  = (e: MouseEvent) => { mx = e.clientX; my = e.clientY; visible = true; };
+    const onOver  = (e: MouseEvent) => { if ((e.target as HTMLElement).closest("[data-cursor-hover]")) hovering = true; };
+    const onOut   = (e: MouseEvent) => { if ((e.target as HTMLElement).closest("[data-cursor-hover]")) hovering = false; };
+    const onLeave = () => { visible = false; };
+
+    const tick = () => {
+      dot.style.transform  = `translate(${mx - 4}px, ${my - 4}px)`;
+      dot.style.opacity    = visible ? "1" : "0";
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      const size             = hovering ? 56 : 32;
+      ring.style.width       = size + "px";
+      ring.style.height      = size + "px";
+      ring.style.transform   = `translate(${rx - size / 2}px, ${ry - size / 2}px)`;
+      ring.style.borderColor = hovering ? "hsl(16,100%,50%)" : "rgba(255,255,255,0.45)";
+      ring.style.opacity     = visible ? (hovering ? "0.9" : "0.45") : "0";
+      raf = requestAnimationFrame(tick);
     };
-    rafId.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(rafId.current);
-  }, [isHovering]);
+    raf = requestAnimationFrame(tick);
 
-  useEffect(() => {
-    const move = (e: MouseEvent) => {
-      dotPos.current = { x: e.clientX, y: e.clientY };
-      setPosition({ x: e.clientX, y: e.clientY });
-      if (!isVisible) setIsVisible(true);
-    };
-
-    const handleOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const hoverEl = target.closest("[data-cursor-hover]");
-      if (hoverEl) {
-        setIsHovering(true);
-        setLabel((hoverEl as HTMLElement).dataset.cursorLabel ?? "");
-      }
-    };
-
-    const handleOut = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest("[data-cursor-hover]")) {
-        setIsHovering(false);
-        setLabel("");
-      }
-    };
-
-    const handleLeave = () => setIsVisible(false);
-
-    window.addEventListener("mousemove", move);
-    window.addEventListener("mouseover", handleOver);
-    window.addEventListener("mouseout", handleOut);
-    document.addEventListener("mouseleave", handleLeave);
-
+    window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("mouseover", onOver, { passive: true });
+    window.addEventListener("mouseout",  onOut,  { passive: true });
+    document.addEventListener("mouseleave", onLeave);
     return () => {
-      window.removeEventListener("mousemove", move);
-      window.removeEventListener("mouseover", handleOver);
-      window.removeEventListener("mouseout", handleOut);
-      document.removeEventListener("mouseleave", handleLeave);
+      cancelAnimationFrame(raf);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseover", onOver);
+      window.removeEventListener("mouseout",  onOut);
+      document.removeEventListener("mouseleave", onLeave);
     };
-  }, [isVisible]);
+  }, []);
 
-  // Hide on touch devices
   if (typeof window !== "undefined" && "ontouchstart" in window) return null;
-
-  const ringSize = isHovering ? 56 : 36;
 
   return (
     <>
-      {/* ── Dot — snaps instantly ── */}
-      <motion.div
-        className="fixed top-0 left-0 z-[9999] pointer-events-none"
-        animate={{
-          x: position.x - 4,
-          y: position.y - 4,
-          opacity: isVisible ? 1 : 0,
-        }}
-        transition={{ type: "spring", stiffness: 800, damping: 35, mass: 0.3 }}
-        style={{
-          width: 8,
-          height: 8,
-          borderRadius: "50%",
-          backgroundColor: "hsl(16, 100%, 50%)",
-          mixBlendMode: "difference",
-        }}
-      />
-
-      {/* ── Ring — lags behind (RAF), expands on hover ── */}
-      <div
-        ref={ringRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9998]"
-        style={{
-          width: ringSize,
-          height: ringSize,
-          borderRadius: "50%",
-          border: "1.5px solid hsl(16, 100%, 50%)",
-          opacity: isVisible ? (isHovering ? 0.9 : 0.5) : 0,
-          transition: "width 0.3s cubic-bezier(0.22,1,0.36,1), height 0.3s cubic-bezier(0.22,1,0.36,1), opacity 0.2s ease",
-          mixBlendMode: "difference",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {/* Inner label that appears on hover */}
-        {isHovering && label && (
-          <span
-            style={{
-              fontSize: 9,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "hsl(16, 100%, 50%)",
-              whiteSpace: "nowrap",
-              pointerEvents: "none",
-              mixBlendMode: "normal",
-            }}
-          >
-            {label}
-          </span>
-        )}
-      </div>
+      <div ref={dotRef} style={{
+        position:"fixed",top:0,left:0,width:8,height:8,borderRadius:"50%",
+        background:"hsl(16,100%,50%)",pointerEvents:"none",zIndex:9999,
+        opacity:0,willChange:"transform",mixBlendMode:"difference",
+      }}/>
+      <div ref={ringRef} style={{
+        position:"fixed",top:0,left:0,width:32,height:32,borderRadius:"50%",
+        border:"1.5px solid rgba(255,255,255,0.45)",pointerEvents:"none",zIndex:9998,
+        opacity:0,willChange:"transform",mixBlendMode:"difference",
+        transition:"width 0.22s cubic-bezier(0.22,1,0.36,1),height 0.22s cubic-bezier(0.22,1,0.36,1),border-color 0.18s ease",
+      }}/>
     </>
   );
 };
