@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ProjectDetail from "./ProjectDetail";
@@ -13,11 +13,57 @@ interface PortfolioProject {
   videos?: string[];
 }
 
-// ─── PATHS MATCH EXACT GIT TRACKED FILENAMES ───────────────────────────────
-// habitat/   latropik/   melstar/   → all lowercase (as committed in git)
-// Vital HR/  Riah Rare/  ELCHAY Social Media/  Video/ → original casing
-// Spaces are encoded as %20
-// ────────────────────────────────────────────────────────────────────────────
+// ─── Best 4-5 images per project for the auto-scroll thumbnail ──────────────
+// Ordered: most visually striking first
+const THUMBNAIL_PICKS: Record<string, string[]> = {
+  "vital-hr": [
+    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-45.jpg",
+    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-32.jpg",
+    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-28.jpg",
+    "/images/Vital%20HR%20SM%20Banner/Artboard%201.jpg",
+    "/images/Vital%20HR/Vital%20HR%20Brand%20strategy%20and%20Moodboard-44.jpg",
+  ],
+  "habitat": [
+    "/images/habitat/Habitat%20Prj-24.jpg",
+    "/images/habitat/Habitat%20Prj-30.jpg",
+    "/images/habitat/Habitat%20Prj-34.jpg",
+    "/images/habitat/broch%20mock.jpg",
+    "/images/habitat/Artboard%201.jpg",
+  ],
+  "latropik": [
+    "/images/latropik/la%20tropik-03.jpg",
+    "/images/latropik/la%20tropik-07.jpg",
+    "/images/latropik/la%20tropik-12.jpg",
+    "/images/latropik/la%20tropik-17.jpg",
+    "/images/latropik/trop%20ban.jpg",
+  ],
+  "elchay": [
+    "/images/ELCHAY%20Social%20Media/Artboard%201.jpg",
+    "/images/ELCHAY%20Social%20Media/Artboard%204.jpg",
+    "/images/ELCHAY%20Social%20Media/Artboard%207.jpg",
+    "/images/ELCHAY%20Social%20Media/Artboard%2014.jpg",
+    "/images/ELCHAY%20Social%20Media/Artboard%2019.jpg",
+  ],
+  "melstar": [
+    "/images/melstar/Artboard%204.jpg",
+    "/images/melstar/Artboard%206.jpg",
+    "/images/melstar/Artboard%208.jpg",
+    "/images/melstar/Artboard%2010.jpg",
+    "/images/melstar/Artboard%202.jpg",
+  ],
+  "riahrare": [
+    "/images/Riah%20Rare/Artboard%201.jpg",
+    "/images/Riah%20Rare/Artboard%203.jpg",
+    "/images/Riah%20Rare/Artboard%205.jpg",
+    "/images/Riah%20Rare/Artboard%207.jpg",
+    "/images/Riah%20Rare/Artboard%202.jpg",
+  ],
+  "video-editing": [
+    "/images/melstar/Artboard%201.jpg",
+    "/images/ELCHAY%20Social%20Media/Artboard%202.jpg",
+    "/images/habitat/Habitat%20Prj-22.jpg",
+  ],
+};
 
 const projects: PortfolioProject[] = [
   {
@@ -62,7 +108,6 @@ const projects: PortfolioProject[] = [
     title: "HABITAT",
     code: "N0.0002-25",
     category: "Branding",
-    // ✅ lowercase "habitat" — matches git
     image: "/images/habitat/Habitat%20Prj-24.jpg",
     images: [
       "/images/habitat/Habitat%20Prj-21.jpg",
@@ -108,7 +153,6 @@ const projects: PortfolioProject[] = [
     title: "LATROPIK",
     code: "N0.0003-25",
     category: "Branding",
-    // ✅ lowercase "latropik" — matches git
     image: "/images/latropik/la%20tropik-03.jpg",
     images: [
       "/images/latropik/la%20tropik-02.jpg",
@@ -171,7 +215,6 @@ const projects: PortfolioProject[] = [
     title: "MELSTAR",
     code: "N0.0005-25",
     category: "Social Media",
-    // ✅ lowercase "melstar" — matches git
     image: "/images/melstar/Artboard%204.jpg",
     images: [
       "/images/melstar/Artboard%202.jpg",
@@ -218,8 +261,161 @@ const projects: PortfolioProject[] = [
   },
 ];
 
-const isVideo = (path: string) => /\.(mp4|webm|ogg|mov)$/i.test(path);
+// ─── Auto-scrolling thumbnail card ─────────────────────────────────────────
+interface ThumbnailCardProps {
+  project: PortfolioProject;
+  onClick: () => void;
+}
 
+const ThumbnailCard = ({ project, onClick }: ThumbnailCardProps) => {
+  const thumbs = THUMBNAIL_PICKS[project.id] ?? [project.image];
+  const [imgIndex, setImgIndex] = useState(0);
+  const [hovered, setHovered] = useState(false);
+  const [mouseXRatio, setMouseXRatio] = useState(0.5);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval>>();
+
+  // Auto-scroll thumbnails, pause on hover
+  useEffect(() => {
+    if (hovered || thumbs.length <= 1) {
+      clearInterval(intervalRef.current);
+      return;
+    }
+    intervalRef.current = setInterval(() => {
+      setImgIndex((prev) => (prev + 1) % thumbs.length);
+    }, 1700);
+    return () => clearInterval(intervalRef.current);
+  }, [hovered, thumbs.length]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setMouseXRatio((e.clientX - rect.left) / rect.width);
+  };
+
+  // Lean toward cursor
+  const leanX = hovered ? (mouseXRatio - 0.5) * 22 : 0;
+  const leanRotate = hovered ? (mouseXRatio - 0.5) * 5 : 0;
+  const leanScale = hovered ? 1.045 : 1;
+
+  return (
+    <motion.div
+      key={project.id}
+      className="flex-shrink-0 w-[90vw] md:w-[40vw] cursor-pointer"
+      data-cursor-hover
+      onClick={onClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => { setHovered(false); setMouseXRatio(0.5); }}
+      onMouseMove={handleMouseMove}
+    >
+      {/* Thumbnail wrapper */}
+      <div
+        ref={cardRef}
+        style={{
+          transform: `translateX(${leanX}px) rotate(${leanRotate}deg) scale(${leanScale})`,
+          transition: hovered
+            ? "transform 0.15s cubic-bezier(0.22,1,0.36,1)"
+            : "transform 0.55s cubic-bezier(0.22,1,0.36,1)",
+          willChange: "transform",
+        }}
+        className="aspect-[4/3] mb-4 overflow-hidden rounded-xl bg-muted relative"
+      >
+        {/* Crossfading images */}
+        {thumbs.map((src, i) => (
+          <img
+            key={src}
+            src={src}
+            alt={`${project.title} ${i}`}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{
+              opacity: i === imgIndex ? 1 : 0,
+              transition: "opacity 0.75s ease",
+            }}
+            loading="lazy"
+          />
+        ))}
+
+        {/* Dot progress bar */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: 12,
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            gap: 5,
+            zIndex: 10,
+          }}
+        >
+          {thumbs.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: i === imgIndex ? 18 : 5,
+                height: 4,
+                borderRadius: 3,
+                background: i === imgIndex ? "hsl(16,100%,50%)" : "rgba(255,255,255,0.35)",
+                transition: "all 0.4s ease",
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Hover overlay with arrow */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(135deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.45) 100%)",
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 0.3s ease",
+          }}
+        />
+
+        {/* "View project" label */}
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 0.25s ease",
+            color: "#fff",
+            fontSize: 11,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            fontWeight: 600,
+            whiteSpace: "nowrap",
+            textShadow: "0 2px 12px rgba(0,0,0,0.6)",
+            pointerEvents: "none",
+          }}
+        >
+          View Project →
+        </div>
+      </div>
+
+      {/* Card label */}
+      <div className="text-center">
+        <h3
+          className="text-xl font-semibold"
+          style={{
+            color: hovered ? "hsl(16,100%,50%)" : undefined,
+            transition: "color 0.3s ease",
+          }}
+        >
+          {project.title}
+        </h3>
+        <p className="text-muted-foreground">
+          {project.category}
+          <span className="ml-2">({project.code})</span>
+        </p>
+      </div>
+    </motion.div>
+  );
+};
+
+// ─── Main HorizontalPortfolio ───────────────────────────────────────────────
 const HorizontalPortfolio = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
@@ -264,39 +460,14 @@ const HorizontalPortfolio = () => {
               ({String(activeIndex + 1).padStart(2, "0")}/{String(projects.length).padStart(2, "0")})
             </span>
           </div>
+
           <div ref={scrollRef} className="flex overflow-x-hidden space-x-4 md:space-x-8">
             {projects.map((project) => (
-              <motion.div
+              <ThumbnailCard
                 key={project.id}
-                className="flex-shrink-0 w-[90vw] md:w-[40vw] cursor-pointer"
+                project={project}
                 onClick={() => setSelectedProject(project)}
-              >
-                <div className="aspect-[4/3] mb-4 overflow-hidden rounded-xl bg-muted">
-                  {isVideo(project.image) ? (
-                    <video
-                      src={project.image}
-                      className="w-full h-full object-cover"
-                      muted
-                      playsInline
-                      preload="metadata"
-                    />
-                  ) : (
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                  )}
-                </div>
-                <div className="text-center">
-                  <h3 className="text-xl font-semibold">{project.title}</h3>
-                  <p className="text-muted-foreground">
-                    {project.category}
-                    <span className="ml-2">({project.code})</span>
-                  </p>
-                </div>
-              </motion.div>
+              />
             ))}
           </div>
         </div>
